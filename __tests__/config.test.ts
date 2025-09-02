@@ -4,7 +4,7 @@ import * as path from 'path';
 import { TestConfig } from '../src/Config/types';
 import { deleteEmptyFolder, createEmptyFolder } from './helpers/folderHelper';
 
-describe('config setup', () => {
+describe('config parsing and setup', () => {
 
   test('importConfig_ConfigPresent_ConfigMatches', () => {
     const configObject: TestConfig = {
