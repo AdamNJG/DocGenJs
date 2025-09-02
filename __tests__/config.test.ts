@@ -4,7 +4,7 @@ import * as path from 'path';
 import { TestConfig } from '../src/Config/types';
 import { deleteEmptyFolder, createEmptyFolder } from './helpers/folderHelper';
 
-describe('config setup', () => {
+describe('config parsing and setup', () => {
 
   test('importConfig_ConfigPresent_ConfigMatches', () => {
     const configObject: TestConfig = {
@@ -120,14 +120,14 @@ describe('config setup', () => {
 describe('get files', () => {
   test('successfullConfig_getFiles_hasFiles', () => {
     const configObject: TestConfig = {
-      includes: ['./__tests__/**']
+      includes: ['./__tests__']
     };
 
     const result = Config.parse(configObject);
 
     if (result.validated === true) {
       const relativeFiles = result.config.files.map(file =>
-        path.relative(process.cwd(), file));
+        path.relative(process.cwd(), file).replace(/\\/g, '/'));
 
       expect(relativeFiles).toStrictEqual([
         '__tests__/components.test.js',
@@ -150,12 +150,12 @@ describe('get files', () => {
 
   test('successfullConfig_getFilesExcludes_hasFiles', () => {
     const configObject: TestConfig = {
-      includes: ['./__tests__/**'],
+      includes: ['./__tests__'],
       excludes: [
         './__tests__/helpers/**', 
         './__tests__/treeBuilderFakeTests/**',
         './__tests__/treeBuilderFakeTestsRenames/**',
-        '__tests__/fakeComponents/**'
+        './__tests__/fakeComponents/**'
       ]
     };
 
@@ -177,12 +177,11 @@ describe('get files', () => {
 
   test('successfulConfig_testFileExtensions_getsCorrectFiles', () => {
     const configObject: TestConfig = {
-      includes: ['./__tests__/**'],
+      includes: ['./__tests__'],
       excludes: [
         './__tests__/helpers/**', 
         './__tests__/treeBuilderFakeTests/**',
-        './__tests__/treeBuilderFakeTestsRenames/**',
-        './__tests__/fakeComponents/**'
+        './__tests__/treeBuilderFakeTestsRenames/**'
       ],
       additionalFileExtensions: ['tsx', 'jsx']
     };
@@ -194,14 +193,78 @@ describe('get files', () => {
         path.relative(process.cwd(), file).replace(/\\/g, '/'));
 
       expect(relativeFiles).toStrictEqual([
+        '__tests__/components.test.js',
+        '__tests__/config.test.ts',
         '__tests__/fakeComponents/fakeJsComponent.test.jsx',
         '__tests__/fakeComponents/fakeTsComponent.test.tsx',
+        '__tests__/pageBuilder.test.ts',
+        '__tests__/siteBuilder.test.ts',
+        '__tests__/treeBuilder.test.ts'
+      ]);
+    }
+  });
+
+  test('collects files recursively and applies excludes correctly', () => {
+    const configObject: TestConfig = {
+      includes: ['./__tests__'],
+      excludes: [
+        './__tests__/helpers/**', 
+        './__tests__/treeBuilderFakeTests/**',
+        './__tests__/treeBuilderFakeTestsRenames/**',
+        '__tests__/fakeComponents/**'
+      ],
+      additionalFileExtensions: ['tsx', 'jsx']
+    };
+
+    const result = Config.parse(configObject);
+
+    if (result.validated === true) {
+      const relativeFiles = result.config.files.map(file =>
+        path.relative(process.cwd(), file).replace(/\\/g, '/'));
+
+      expect(relativeFiles).toStrictEqual([
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
         '__tests__/pageBuilder.test.ts',
         '__tests__/siteBuilder.test.ts',
         '__tests__/treeBuilder.test.ts'
       ]);
+    }
+  });
+
+  test('additionalFileExtensions_areMergedWithDefaults', () => {
+    const configObject: TestConfig = {
+      includes: ['./__tests__/fakeComponents'],
+      additionalFileExtensions: ['ts', 'js', 'jsx']
+    };
+
+    const result = Config.parse(configObject);
+    if (result.validated === false) console.log(result.message);
+
+    expect(result.validated).toBe(true);
+
+    if (result.validated === true) {
+      const files = result.config.files.map(f => path.relative(process.cwd(), f).replace(/\\/g, '/'));
+
+      console.log(files);
+
+      expect(files).toContain('__tests__/fakeComponents/fakeJsComponent.test.jsx');
+    }
+  });
+
+  test('excludes_pattern_skipsFilesCorrectly', () => {
+    const configObject: TestConfig = {
+      includes: ['./__tests__'],
+      excludes: ['./__tests__/components.test.js']
+    };
+
+    const result = Config.parse(configObject);
+    if (result.validated === false) console.log(result.message);
+
+    expect(result.validated).toBe(true);
+    if (result.validated === true) {
+      const files = result.config.files.map(f => path.relative(process.cwd(), f).replace(/\\/g, '/'));
+      expect(files).not.toContain('__tests__/components.test.js');
     }
   });
 });

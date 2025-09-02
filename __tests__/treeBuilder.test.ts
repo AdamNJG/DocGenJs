@@ -8,7 +8,7 @@ describe('tree builder', () => {
   const codeExample = `const a = 1;\nconst b = 2;\nexpect(a + b).toBe(3);`;
   test('creates tree with renamed functions and keeps ".test" suffix', () => {
     const config = BuildConfig({
-      includes: ['__tests__\\treeBuilderFakeTestsRenames'],
+      includes: ['__tests__/treeBuilderFakeTestsRenames'],
       testFunctionNameOverride: 'testProxy',
       describeFunctionNameOverride: 'describeProxy'
     });
@@ -28,7 +28,7 @@ describe('tree builder', () => {
 
   test('creates tree with renamed functions and removes "test" suffix', () => {
     const config = BuildConfig({
-      includes: ['__tests__\\treeBuilderFakeTestsRenames'],
+      includes: ['__tests__/treeBuilderFakeTestsRenames'],
       testFunctionNameOverride: 'testProxy',
       describeFunctionNameOverride: 'describeProxy',
       testSuffixToRemove: 'test'
@@ -43,7 +43,7 @@ describe('tree builder', () => {
 
   test('creates tree with default config and keeps ".test" suffix', () => {
     const config = BuildConfig({
-      includes: ['__tests__\\treeBuilderFakeTests'],
+      includes: ['./__tests__/treeBuilderFakeTests'],
       testFunctionNameOverride: 'test', 
       describeFunctionNameOverride: 'describe'
     });
@@ -85,7 +85,7 @@ describe('tree builder', () => {
 
   test('creates tree with default config and top level test statements', () => {
     const config = BuildConfig({
-      includes: ['__tests__\\treeBuilderFakeTests'],
+      includes: ['__tests__/treeBuilderFakeTests'],
       testFunctionNameOverride: 'test', 
       describeFunctionNameOverride: 'describe'
     });
