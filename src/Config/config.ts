@@ -95,7 +95,6 @@ export default class Config {
       const fullPath = path.join(dir, entry.name);
       const relPath = path.relative(projectRoot, fullPath).replace(/\\/g, '/'); 
 
-      console.log(`${relPath}`);
       if (micromatch.isMatch(relPath, config.excludes)) {
         continue;
       }

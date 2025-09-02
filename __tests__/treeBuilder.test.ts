@@ -43,7 +43,7 @@ describe('tree builder', () => {
 
   test('creates tree with default config and keeps ".test" suffix', () => {
     const config = BuildConfig({
-      includes: ['__tests__\\treeBuilderFakeTests'],
+      includes: ['./__tests__/treeBuilderFakeTests'],
       testFunctionNameOverride: 'test', 
       describeFunctionNameOverride: 'describe'
     });
