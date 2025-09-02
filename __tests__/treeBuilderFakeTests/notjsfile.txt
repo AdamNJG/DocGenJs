@@ -1,0 +1,1 @@
+this file is to kill mutants and ensure that non js/ts files are not picked up

@@ -1,0 +1,109 @@
+import Config from '../../Config/config';
+import type { TestConfig } from '../../Config/types';
+import * as fs from 'fs';
+import * as path from 'path';
+import PageNav from '../Components/index/pageNav';
+import TreeBuilder from '../../TreeBuilder/treeBuilder';
+import PageBuilder from '../PageBuilder/pageBuilder';
+
+type CopyResult =
+  | { success: true; }
+  | { success: false; message: string};
+
+class SiteBuilder {
+  private _config: Config;
+  private _indexNav: string = '';
+  private _pages: string[] = [];
+
+  constructor (config: TestConfig) {
+    const configResult = Config.parse(config);
+    if (configResult.validated === false) {
+      throw new Error('invalid config: ' + configResult.message);
+    }
+    this._config = configResult.config;
+  }
+
+  buildSite () {
+    this.ensureDocumentationDirectoryIsClean(this._config.outputDirectory);
+    this.buildPages();
+
+    this.setIndexNav();
+    
+    this.copyIndexHtmlAndCss(this._config.outputDirectory);
+  }
+
+  private ensureDocumentationDirectoryIsClean (dirPath: string) {
+    if (fs.existsSync(dirPath)) {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+    }
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+
+  private copyIndexHtmlAndCss (dirPath: string) {
+    const indexDestFilePath = path.join(dirPath, 'index.html');
+    const indexResult = this.generateFile(`./${this._config.templateDirectory}/index.html`, indexDestFilePath, (input) => {return input.replace(/{{PAGE_NAV}}/g, this._indexNav);});
+
+    if (indexResult.success === false) {
+      console.error(indexResult.message);
+    } else {
+      console.log(`file generated in: ${indexDestFilePath}`);
+    }
+
+    const cssDestFilePath = path.join(dirPath, 'styles.css');
+    const cssResult = this.generateFile(`./${this._config.templateDirectory}/styles.css`, cssDestFilePath);
+
+    if (cssResult.success === false) {
+      console.error(cssResult.message);
+    } else {
+      console.log(`file generated in: ${cssDestFilePath}`);
+    }
+  }
+
+  private generateFile (sourceFileName: string, destFilePath: string, transformFunction?: (string: string) => string) : CopyResult {
+    const sourceFilePath = path.resolve(sourceFileName);
+
+    if (!fs.existsSync(sourceFilePath)) {
+      return { success: false, message: `Source file does not exist: ${sourceFilePath}, aborting copy for this file` };
+    }
+
+    try {
+      const fileContent = fs.readFileSync(sourceFilePath, 'utf-8');
+
+      const transformedFileContent = transformFunction ? transformFunction(fileContent) : fileContent;
+
+      fs.writeFileSync(destFilePath, transformedFileContent, 'utf-8');
+
+      return { success: true };
+    } catch (err) { 
+      return { success: false, message: `Copy for file ${sourceFilePath} failed: ${err}` };
+    } 
+  }
+
+  private setIndexNav () {
+    const nav =  new PageNav();
+    nav.setup(this._pages);
+    this._indexNav = nav.outerHTML;
+  }
+
+  private buildPages () {
+    const tree = TreeBuilder.build(this._config);
+    const pages = PageBuilder.buildPages(tree);
+
+    Object.entries(pages).forEach(([key, value]) => {
+      this.createHtmlFromPage(key, value);
+    });
+
+    this._pages = Object.keys(pages);
+  }
+
+  private createHtmlFromPage (pageName: string, page: string) {
+    try {
+      const outputDir = path.join(this._config.outputDirectory, `${pageName}.html`);
+      fs.writeFileSync(outputDir, page,'utf-8');
+    } catch (err) {
+      console.error(`Error saving html file: ${pageName}.html, Error: ${err}`);
+    }
+  }
+}
+
+export default SiteBuilder;
