@@ -85,7 +85,7 @@ describe('SiteBuilder', () => {
     const consoleSpy: ReturnType<typeof vi.spyOn> = vi.spyOn(console, 'error').mockImplementation(() => {});
     const outputDirectory = './__tests__/docs';
     const templateDirectory = './__tests__/no_template';
-    const resolvedTemplatePath = path.resolve(templateDirectory);
+    const resolvedTemplatePath = path.join(process.cwd(), '__tests__', 'no_template');
     createEmptyFolder(resolvedTemplatePath);
 
     const config: TestConfig = {
