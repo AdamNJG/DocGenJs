@@ -81,12 +81,12 @@ describe('SiteBuilder', () => {
     , config);
   });
 
-  test('passing in json config with overriden templateDirectory that exists but is empty', () => {
+  test('passing in json config with overriden templateDirectory that exists but is empty', async () => {
     const consoleSpy: ReturnType<typeof vi.spyOn> = vi.spyOn(console, 'error').mockImplementation(() => {});
     const outputDirectory = './__tests__/docs';
     const templateDirectory = './__tests__/no_template';
     const resolvedTemplatePath = path.join(process.cwd(), '__tests__', 'no_template');
-    createEmptyFolder(resolvedTemplatePath);
+    await createEmptyFolder(resolvedTemplatePath);
 
     const config: TestConfig = {
       includes: ['__tests__/treeBuilderFakeTestsRenames'],
