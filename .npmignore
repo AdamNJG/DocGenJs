@@ -1,0 +1,27 @@
+# Node modules (never publish)
+node_modules
+coverage
+__tests__
+reports
+
+# Source files
+src
+
+
+# Config files (only needed for local dev)
+eslint.config.ts
+stryker.config.json
+tsconfig.json
+vitest.config.ts
+vite.config.ts
+docgen.config.ts
+
+# Git and GitHub
+.git
+.github
+
+# Lock files (optional, can keep or remove)
+package-lock.json
+
+# Logs, temp files
+*.log

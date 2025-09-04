@@ -1,5 +1,5 @@
 import Config from '../../Config/config';
-import type { TestConfig } from '../../Config/types';
+import type { DocGenConfig } from '../../Config/types';
 import * as fs from 'fs';
 import * as path from 'path';
 import PageNav from '../Components/index/pageNav';
@@ -15,7 +15,7 @@ class SiteBuilder {
   private _indexNav: string = '';
   private _pages: string[] = [];
 
-  constructor (config: TestConfig) {
+  constructor (config: DocGenConfig) {
     const configResult = Config.parse(config);
     if (configResult.validated === false) {
       throw new Error('invalid config: ' + configResult.message);

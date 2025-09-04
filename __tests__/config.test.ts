@@ -1,13 +1,13 @@
 import { describe, test, expect } from 'vitest';
 import Config from '../src/Config/config';
 import * as path from 'path';
-import { TestConfig } from '../src/Config/types';
+import { DocGenConfig } from '../src/Config/types';
 import { deleteEmptyFolder, createEmptyFolder } from './helpers/folderHelper';
 
 describe('config parsing and setup', () => {
 
   test('importConfig_ConfigPresent_ConfigMatches', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       describeFunctionNameOverride: 'describeProxy',
       testFunctionNameOverride: 'testProxy',
@@ -25,7 +25,7 @@ describe('config parsing and setup', () => {
     const resolvedPath = path.resolve(emptyFolderPath);
     await createEmptyFolder(resolvedPath);
 
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       describeFunctionNameOverride: 'describe',
       testFunctionNameOverride: 'test',
@@ -39,7 +39,7 @@ describe('config parsing and setup', () => {
   });
 
   test('importConfig_defaultDocsOutputDirectory_ConfigMatches', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       describeFunctionNameOverride: 'describe',
       testFunctionNameOverride: 'test'
@@ -51,7 +51,7 @@ describe('config parsing and setup', () => {
   });
 
   test('importConfig_ConfigPresentWithNoDescribeOrTestOverrides_ConfigMatches', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__']
     };
 
@@ -61,7 +61,7 @@ describe('config parsing and setup', () => {
   });
 
   test('importConfig_WrongFolderSelected_TestErrorReturned', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__not_tests__'],
       describeFunctionNameOverride: 'describe',
       testFunctionNameOverride: 'test'     
@@ -72,8 +72,18 @@ describe('config parsing and setup', () => {
     expectInvalidConfig(result, `Test folder specified not found, looking for ${configObject.includes}`);
   });
 
+  test('importConfig_IncludesEmpty_TestErrorReturned', () => {
+    const configObject: DocGenConfig = {
+      includes: []  
+    };
+
+    const result = Config.parse(configObject);
+
+    expectInvalidConfig(result, `Test folder not specified, please add one to the includes array of the config`);
+  });
+
   test('importConfig_WrongFolderSelected_TemplateErrorReturned', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       describeFunctionNameOverride: 'describe',
       testFunctionNameOverride: 'test',
@@ -91,7 +101,7 @@ describe('config parsing and setup', () => {
 
     await createEmptyFolder(resolvedPath);
 
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: [emptyFolderPath],
       describeFunctionNameOverride: 'describe',
       testFunctionNameOverride: 'test'     
@@ -105,7 +115,7 @@ describe('config parsing and setup', () => {
   });
 
   test('importConfig_DescribeAndTestNotFound_TestErrorReturned', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       describeFunctionNameOverride: 'not' + 'describe',
       testFunctionNameOverride: 'not' + 'test'     
@@ -119,7 +129,7 @@ describe('config parsing and setup', () => {
 
 describe('get files', () => {
   test('successfullConfig_getFiles_hasFiles', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__']
     };
 
@@ -132,13 +142,16 @@ describe('get files', () => {
       expect(relativeFiles).toStrictEqual([
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
+        '__tests__/configs/docgen.config.js',
+        '__tests__/configs/docgen.config.ts',
+        '__tests__/configs/template/docgen.config.ts',
         '__tests__/helpers/componentHelper.ts',
         '__tests__/helpers/configHelper.ts',
         '__tests__/helpers/elementHelper.ts',
         '__tests__/helpers/folderHelper.ts',
         '__tests__/helpers/stringHelper.ts',
         '__tests__/pageBuilder.test.ts',
-        '__tests__/siteBuilder.test.ts',
+        '__tests__/runSiteBuilder.test.ts',
         '__tests__/treeBuilder.test.ts',
         '__tests__/treeBuilderFakeTests/fake.test.ts',
         '__tests__/treeBuilderFakeTests/more.fake.test.ts',
@@ -149,7 +162,7 @@ describe('get files', () => {
   });
 
   test('successfullConfig_getFilesExcludes_hasFiles', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       excludes: [
         './__tests__/helpers/**', 
@@ -168,15 +181,18 @@ describe('get files', () => {
       expect(relativeFiles).toStrictEqual([
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
+        '__tests__/configs/docgen.config.js',
+        '__tests__/configs/docgen.config.ts',
+        '__tests__/configs/template/docgen.config.ts',
         '__tests__/pageBuilder.test.ts',
-        '__tests__/siteBuilder.test.ts',
+        '__tests__/runSiteBuilder.test.ts',
         '__tests__/treeBuilder.test.ts'
       ]);
     }
   });
 
   test('successfulConfig_testFileExtensions_getsCorrectFiles', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       excludes: [
         './__tests__/helpers/**', 
@@ -195,17 +211,20 @@ describe('get files', () => {
       expect(relativeFiles).toStrictEqual([
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
+        '__tests__/configs/docgen.config.js',
+        '__tests__/configs/docgen.config.ts',
+        '__tests__/configs/template/docgen.config.ts',
         '__tests__/fakeComponents/fakeJsComponent.test.jsx',
         '__tests__/fakeComponents/fakeTsComponent.test.tsx',
         '__tests__/pageBuilder.test.ts',
-        '__tests__/siteBuilder.test.ts',
+        '__tests__/runSiteBuilder.test.ts',
         '__tests__/treeBuilder.test.ts'
       ]);
     }
   });
 
   test('collects files recursively and applies excludes correctly', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       excludes: [
         './__tests__/helpers/**', 
@@ -225,35 +244,33 @@ describe('get files', () => {
       expect(relativeFiles).toStrictEqual([
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
+        '__tests__/configs/docgen.config.js',
+        '__tests__/configs/docgen.config.ts',
+        '__tests__/configs/template/docgen.config.ts',
         '__tests__/pageBuilder.test.ts',
-        '__tests__/siteBuilder.test.ts',
+        '__tests__/runSiteBuilder.test.ts',
         '__tests__/treeBuilder.test.ts'
       ]);
     }
   });
 
   test('additionalFileExtensions_areMergedWithDefaults', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__/fakeComponents'],
       additionalFileExtensions: ['ts', 'js', 'jsx']
     };
 
     const result = Config.parse(configObject);
-    if (result.validated === false) console.log(result.message);
-
     expect(result.validated).toBe(true);
 
     if (result.validated === true) {
       const files = result.config.files.map(f => path.relative(process.cwd(), f).replace(/\\/g, '/'));
-
-      console.log(files);
-
       expect(files).toContain('__tests__/fakeComponents/fakeJsComponent.test.jsx');
     }
   });
 
   test('excludes_pattern_skipsFilesCorrectly', () => {
-    const configObject: TestConfig = {
+    const configObject: DocGenConfig = {
       includes: ['./__tests__'],
       excludes: ['./__tests__/components.test.js']
     };
@@ -269,7 +286,7 @@ describe('get files', () => {
   });
 });
 
-function expectValidConfig (result, expected: TestConfig) {
+function expectValidConfig (result, expected: DocGenConfig) {
   if (result.validated === false) {
     throw new Error(result.message);
   }

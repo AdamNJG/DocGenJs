@@ -3,7 +3,9 @@ import { Feature, InstructionTree, Page, UseCase } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
 import { parse } from '@babel/parser';
-import traverse from '@babel/traverse';
+import _traverse from '@babel/traverse';
+//@ts-expect-error this is a workaround for getting babel working with multiple exports
+const traverse =  typeof _traverse === 'function' ? _traverse : _traverse.default;
 
 export default class TreeBuilder {
   static build (config: Config): InstructionTree {

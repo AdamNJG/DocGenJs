@@ -1,4 +1,4 @@
-import { TestConfig } from './types';
+import { DocGenConfig } from './types';
 import * as fs from 'fs';
 import * as path from 'path';
 import micromatch from 'micromatch';
@@ -13,16 +13,27 @@ type ValidationResult =
   | { validated: true, files: string[]}
   | ValidationFailure
 
+type FilledConfig = {
+  includes: string[];
+  describeFunctionNameOverride: string;
+  testFunctionNameOverride: string;
+  testSuffixToRemove?: string;
+  outputDirectory: string;
+  templateDirectory: string;
+  excludes?: string[];
+  additionalFileExtensions: string[];
+}
+
 export default class Config {
   includes: string[];
   describeFunctionName: string;
   testFunctionName: string;
-  testSuffixToRemove: string;
+  testSuffixToRemove?: string;
   files: string[];
   outputDirectory: string;
   templateDirectory: string;
 
-  private constructor (config: TestConfig, files: string[]) {
+  private constructor (config: FilledConfig, files: string[]) {
     this.includes = config.includes;
     this.describeFunctionName = config.describeFunctionNameOverride;
     this.testFunctionName = config.testFunctionNameOverride;
@@ -32,7 +43,7 @@ export default class Config {
     this.templateDirectory = config.templateDirectory;
   }
 
-  static parse (config: TestConfig): ConfigResult {
+  static parse (config: DocGenConfig): ConfigResult {
     const updatedConfig = Config.applyDefaults(config);
 
     const validationResult = Config.validate(updatedConfig);
@@ -42,7 +53,7 @@ export default class Config {
       : validationResult;
   }
 
-  static applyDefaults (config: TestConfig) : TestConfig {
+  static applyDefaults (config: DocGenConfig) : FilledConfig {
     const defaultFileExtensions = ['ts', 'js'];
 
     return { 
@@ -56,8 +67,12 @@ export default class Config {
     };
   }
 
-  static validate (config: TestConfig): ValidationResult {
+  static validate (config: FilledConfig): ValidationResult {
     const files: string[] = [];
+
+    if (config.includes.length === 0) {
+      return { validated: false, message: `Test folder not specified, please add one to the includes array of the config` };
+    }
 
     for (const folder of config.includes) {
       if (!fs.existsSync(folder)) {
@@ -86,7 +101,7 @@ export default class Config {
     return { validated: true, files: files };
   }
 
-  static getAllFiles (dir: string, config: TestConfig): string[] {
+  static getAllFiles (dir: string, config: FilledConfig): string[] {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     const files: string[] = [];
     const projectRoot = process.cwd();
@@ -95,7 +110,7 @@ export default class Config {
       const fullPath = path.join(dir, entry.name);
       const relPath = path.relative(projectRoot, fullPath).replace(/\\/g, '/'); 
 
-      if (micromatch.isMatch(relPath, config.excludes)) {
+      if (micromatch.isMatch(relPath, config.excludes ?? [], {})) {
         continue;
       }
 
@@ -110,7 +125,7 @@ export default class Config {
     return files;
   }
 
-  static hasValidEntryPoint (folderFiles: string[], config: TestConfig) : boolean {
+  static hasValidEntryPoint (folderFiles: string[], config: FilledConfig) : boolean {
     return folderFiles.some(file => {
       const content: string = fs.readFileSync(file, 'utf-8');
       return content.includes(config.describeFunctionNameOverride) || content.includes(config.testFunctionNameOverride);

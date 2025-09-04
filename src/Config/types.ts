@@ -1,4 +1,4 @@
-export type TestConfig = {
+export type DocGenConfig = {
   includes: string[];
   describeFunctionNameOverride?: string;
   testFunctionNameOverride?: string;
