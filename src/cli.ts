@@ -1,32 +1,21 @@
 #!/usr/bin/env node
 
 import { JSDOM } from 'jsdom';
-import type { TestConfig } from './Config/types.js';
+import runSiteBuilder from './Cli/runSiteBuilder';
 
-startDom();
+async function main () {
+  await startDom();
+
+  runSiteBuilder();
+}
 
 main();
 
-async function main () {
+async function startDom () { 
   const { default: PageNav } = await import('./WebBuilder/Components/index/pageNav.js');
   const { default: FeatureComponent } = await import('./WebBuilder/Components/pages/feature.js');
   const { default: ModuleComponent } = await import('./WebBuilder/Components/pages/module.js');
   const { default: UseCaseComponent } = await import('./WebBuilder/Components/pages/useCase.js');
-  const { default: SiteBuilder } = await import('./WebBuilder/SiteBuilder/siteBuilder.js');
-
-  const config: TestConfig = {
-    includes: ['__tests__'],
-    describeFunctionNameOverride: 'describe',
-    testFunctionNameOverride: 'test'
-  };
-
-  declareComponents({ 'page-nav': PageNav, 'feature-component': FeatureComponent, 'module-component' : ModuleComponent, 'use-case-component': UseCaseComponent });
-
-  const siteBuilder = new SiteBuilder(config);
-  siteBuilder.buildSite();
-}
-
-function startDom () { 
 
   const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
 
@@ -38,6 +27,8 @@ function startDom () {
   globalThis.CustomEvent = dom.window.CustomEvent;
   globalThis.Event = dom.window.Event;
   globalThis.customElements = dom.window.customElements;
+
+  declareComponents({ 'page-nav': PageNav, 'feature-component': FeatureComponent, 'module-component' : ModuleComponent, 'use-case-component': UseCaseComponent });
 }
 
 function declareComponents (components: Record<string, CustomElementConstructor>) {

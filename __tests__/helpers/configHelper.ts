@@ -1,5 +1,5 @@
 import Config from '../../src/Config/config';
-import { TestConfig } from '../../src/Config/types';
+import { DocGenConfig } from '../../src/Config/types';
 
 export function BuildConfig ({
   includes = ['__tests__'], 
@@ -8,7 +8,7 @@ export function BuildConfig ({
   testSuffixToRemove,
   outputDirectory,
   templateDirectory
-} : TestConfig): Config {
+} : DocGenConfig): Config {
   const result = Config.parse({ 
     includes, 
     testFunctionNameOverride: testFunctionName, 

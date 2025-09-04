@@ -1,11 +1,18 @@
-import { describe, test, expect, afterEach, vi } from 'vitest';
+import { describe, test, expect, afterEach, vi, vitest, beforeEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import SiteBuilder from '../src/WebBuilder/SiteBuilder/siteBuilder';
+import runSiteBuilder from '../src/Cli/runSiteBuilder';
 import { defineComponents } from './helpers/componentHelper';
-import { TestConfig } from '../src/Config/types';
+import { DocGenConfig } from '../src/Config/types';
 import { deleteEmptyFolder, createEmptyFolder } from './helpers/folderHelper';
 import { testElement } from './helpers/elementHelper';
+import { checkGeneratedPages, checkMain, checkPage, expectGeneratedFiles, removeOutputDirectory } from './helpers/folderHelper';
+
+const CONFIG_FILE = path.resolve('./docgen.config');
+const CONFIG_FILE_TS = CONFIG_FILE + '.ts';
+const CONFIG_FILE_JS = CONFIG_FILE + '.js';
+const TEST_CONFIG_FILE = path.resolve('./__tests__/configs/docgen.config');
 
 describe('SiteBuilder', () => {
   defineComponents();
@@ -21,37 +28,39 @@ describe('SiteBuilder', () => {
   afterEach(async () => {
     await removeOutputDirectory('./__tests__/docs/');
     await removeOutputDirectory('./docs');
+    await restoreDocGenConfig();
   });
 
-  test('json config will trigger site generation to default location, overriding existing files', () => {
-    const outputDirectory = './docs';
-    const config: TestConfig = {
-      includes: [path.join('__tests__', 'treeBuilderFakeTestsRenames')],
-      describeFunctionNameOverride: 'describeProxy',
-      testFunctionNameOverride: 'testProxy'
-    };
+  beforeEach(() => {
+    vitest.resetModules();
+  });
+
+  test('json config will trigger site generation to default location, overriding existing files', async () => {
+    const outputDirectory = './__tests__/docs/runSiteBuilderTests';
+
+    await replaceDocGenConfig('.ts');
+
     fs.mkdirSync(outputDirectory, { recursive: true });
     const dummyPagePath = path.join(outputDirectory, 'oldPage.html');
     fs.writeFileSync(dummyPagePath, 'old content', 'utf-8');
 
-    const builder = new SiteBuilder(config);
-    builder.buildSite();
+    await runSiteBuilder();
 
     expect(fs.existsSync(dummyPagePath)).toBe(false);
     expect(fs.existsSync(outputDirectory)).toBe(true);
     expectGeneratedFiles(outputDirectory, expectedFiles);
   });
 
-  test('passing in json config will trigger site generation to specified location', () => {
+  test('passing in json config will trigger site generation to specified location', async () => {
     const outputDirectory = './__tests__/docs';
 
-    const config: TestConfig = {
+    await replaceDocGenConfig('.js');
+    const config = {
       includes: ['__tests__/treeBuilderFakeTests'],
-      outputDirectory: outputDirectory
+      outputDirectory: './__tests__/docs'
     };
 
-    const builder = new SiteBuilder(config);
-    builder.buildSite();
+    await runSiteBuilder();
 
     expect(fs.existsSync(outputDirectory)).toBe(true);
     expectGeneratedFiles(outputDirectory, expectedFiles);
@@ -82,22 +91,15 @@ describe('SiteBuilder', () => {
   });
 
   test('passing in json config with overriden templateDirectory that exists but is empty', async () => {
+    await replaceDocGenConfig('.ts', './__tests__/configs/template/docgen.config.ts');
+
     const consoleSpy: ReturnType<typeof vi.spyOn> = vi.spyOn(console, 'error').mockImplementation(() => {});
     const outputDirectory = './__tests__/docs';
     const templateDirectory = './__tests__/no_template';
     const resolvedTemplatePath = path.join(process.cwd(), '__tests__', 'no_template');
     await createEmptyFolder(resolvedTemplatePath);
 
-    const config: TestConfig = {
-      includes: ['__tests__/treeBuilderFakeTestsRenames'],
-      testFunctionNameOverride: 'testProxy',
-      describeFunctionNameOverride: 'describeProxy',
-      outputDirectory: outputDirectory,
-      templateDirectory: templateDirectory
-    };
-
-    const builder = new SiteBuilder(config);
-    builder.buildSite();
+    await runSiteBuilder();
 
     expect(fs.existsSync(outputDirectory)).toBe(true);
     expectGeneratedFiles(outputDirectory, expectedFiles, false);
@@ -109,8 +111,27 @@ describe('SiteBuilder', () => {
     deleteEmptyFolder(resolvedTemplatePath);
   });
 
+  test('uses default config when none exists', async () => {  
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const outputDirectory = './docs';
+      await renameDocGenConfig();
+
+      await runSiteBuilder();
+
+      expect(consoleSpy.mock.calls[0][0]).toContain('Using default configuration. You can create a docgen.config.ts/js file to customise future runs.');
+      
+      expect(fs.existsSync(outputDirectory)).toBe(true);
+      expectGeneratedFiles(outputDirectory, expectedFiles);
+    
+      checkGeneratedPages(expectedContents, { includes: [], outputDirectory: outputDirectory });
+    } finally {
+      consoleSpy.mockRestore();
+    }
+  });
+
   test('passing in invalid config error displayed', () => {
-    const config: TestConfig = {
+    const config: DocGenConfig = {
       includes: ['']
     };
 
@@ -118,39 +139,32 @@ describe('SiteBuilder', () => {
   });
 });
 
-function removeOutputDirectory (directory: string) {
-  const resolvedPath = path.resolve(directory);
-  return fs.promises.rm(resolvedPath, { recursive: true, force: true });
-}
+async function replaceDocGenConfig (extension: string, filePath?: string) {
+  if (fs.existsSync(CONFIG_FILE_TS)) {
+    await fs.promises.rename(CONFIG_FILE_TS, CONFIG_FILE_TS + '.backup');
+  }
 
-function expectGeneratedFiles (dir: string, files: string[], shouldBeTrue: boolean = true) {
-  for (const file of files) {
-    expect(fs.existsSync(path.join(dir, file))).toBe(shouldBeTrue);
+  if (filePath) {
+    const resolvedFilePath = path.resolve(filePath);
+    await fs.promises.copyFile(resolvedFilePath, CONFIG_FILE_TS);
+  } else {
+    await fs.promises.copyFile(TEST_CONFIG_FILE + extension, CONFIG_FILE + extension);
   }
 }
 
-function checkGeneratedPages (expectedContents: Record<string, (doc: Document) => void>, config: TestConfig) {
-  Object.entries(expectedContents).forEach(([key, expectFunction]) => {
-    const doc = getOutputtedDocument(key, config.outputDirectory ?? '');
-    expectFunction(doc);
-  });
+async function renameDocGenConfig () {
+  if (fs.existsSync(CONFIG_FILE_JS)) await fs.promises.rm(CONFIG_FILE_JS);
+
+  if (fs.existsSync(CONFIG_FILE_TS)) await fs.promises.rename(CONFIG_FILE_TS, CONFIG_FILE_TS + '.backup');
 }
 
-function getOutputtedDocument (page: string, outputDirectory: string): Document { 
-  const joinedPath = path.join(outputDirectory, page);
-  const resolvedPath = path.resolve(joinedPath);
+async function restoreDocGenConfig () {
+  const backupExists = fs.existsSync(CONFIG_FILE_TS + '.backup');
 
-  const html = fs.readFileSync(resolvedPath, 'utf-8');
-  const parser = new DOMParser();
-  return parser.parseFromString(html, 'text/html');
-}
-
-function checkMain (document: Document) {
-  const nav = document.querySelector('.pages-nav');
-  expect(nav).not.toBe(null);
-}
-
-function checkPage (document: Document) { 
-  const module = document.querySelector('.module-component');
-  expect(module).not.toBe(null);
+  if (backupExists) {
+    if (fs.existsSync(CONFIG_FILE_TS)) await fs.promises.rm(CONFIG_FILE_TS);
+    await fs.promises.rename(CONFIG_FILE_TS + '.backup', CONFIG_FILE_TS);
+  } else {
+    if (fs.existsSync(CONFIG_FILE_JS)) await fs.promises.rm(CONFIG_FILE_JS);
+  }
 }

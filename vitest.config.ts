@@ -12,7 +12,8 @@ export default defineConfig({
         'src/index.ts',
         'build.js',
         'src/WebBuilder/Components/setupHtmlElement.ts',
-        '**/node_modules/**'
+        '**/node_modules/**',
+        '**/**.config.**'
       ],
       excludeAfterRemap: true
     },
@@ -20,6 +21,9 @@ export default defineConfig({
       '__tests__/treeBuilderFakeTestsRename/**',
       '__tests__/treeBuilderFakeTests/**',
       'node_modules/**'
-    ]
+    ],
+    sequence: {
+      concurrent: false
+    }
   }
 });

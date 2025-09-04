@@ -1,12 +1,21 @@
 {
   "name": "doc-gen-js",
-  "version": "0.0.1",
+  "version": "0.0.10",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": {
+    "doc-gen-js": "./dist/cli.cjs"
+  },
+  "exports": {
+    "./config": {
+      "types" : "./dist/config.d.ts"
+    }
+  },
+  "type": "module",
   "scripts": {
-    "start": "node ./dist/index.js",
-    "build": "node build.js",
-    "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp",
+    "start": "node ./dist/cli.cjs",
+    "build": "vite build && tsc",
+    "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp && rimraf ./reports && rimraf ./coverage",
     "test": "vitest run --coverage",
     "test:mutation": "npx stryker run && rimraf ./.stryker-tmp"
   },
@@ -19,22 +28,26 @@
     "@stryker-mutator/core": "^9.1.1",
     "@stryker-mutator/jest-runner": "^9.1.1",
     "@stryker-mutator/vitest-runner": "^9.1.1",
-    "@stylistic/eslint-plugin": "^5.2.3",
+    "@stylistic/eslint-plugin": "^5.3.1",
+    "@types/babel__traverse": "^7.28.0",
     "@types/node": "^24.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.41.0",
-    "@typescript-eslint/parser": "^8.41.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
     "@vitest/coverage-v8": "^3.2.4",
-    "esbuild": "^0.25.9",
     "eslint": "^9.34.0",
     "jiti": "^2.5.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
+    "vite": "^7.1.4",
+    "vite-plugin-commonjs": "^0.10.4",
+    "vite-plugin-resolve": "^2.5.2",
     "vitest": "^3.2.4"
   },
   "dependencies": {
     "@babel/parser": "^7.28.3",
     "@babel/traverse": "^7.28.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
     "jsdom": "^26.1.0",
     "micromatch": "^4.0.8"
   }
