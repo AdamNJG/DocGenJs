@@ -9,7 +9,7 @@ async function runSiteBuilder () {
   let config: DocGenConfig;
 
   if (configFile) {
-    const imported = await import(pathToFileUrl(configFile).href, );
+    const imported = await import(pathToFileUrl(configFile).href);
     config = imported.default;
   } else {
     config = {

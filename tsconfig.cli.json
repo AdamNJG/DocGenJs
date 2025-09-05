@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "ESNext",
+    "noEmitOnError": true,
+    "isolatedModules": true
+  },
+  "include": ["src/cli.ts"],
+  "exclude": ["src/**/*", "!src/cli.ts"]
+}

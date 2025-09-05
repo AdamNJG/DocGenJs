@@ -3,11 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import SiteBuilder from '../src/WebBuilder/SiteBuilder/siteBuilder';
 import runSiteBuilder from '../src/Cli/runSiteBuilder';
-import { defineComponents } from './helpers/componentHelper';
 import { DocGenConfig } from '../src/Config/types';
 import { deleteEmptyFolder, createEmptyFolder } from './helpers/folderHelper';
 import { testElement } from './helpers/elementHelper';
 import { checkGeneratedPages, checkMain, checkPage, expectGeneratedFiles, removeOutputDirectory } from './helpers/folderHelper';
+import { defineComponents } from './helpers/componentHelper';
 
 const CONFIG_FILE = path.resolve('./docgen.config');
 const CONFIG_FILE_TS = CONFIG_FILE + '.ts';
