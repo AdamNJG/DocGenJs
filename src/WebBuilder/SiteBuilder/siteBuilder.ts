@@ -2,11 +2,10 @@ import Config from '../../Config/config';
 import type { DocGenConfig } from '../../Config/types';
 import * as fs from 'fs';
 import * as path from 'path';
-import PageNav from '../Components/index/pageNav';
+import PageNav from '../Components/pageNav';
 import TreeBuilder from '../../TreeBuilder/treeBuilder';
 import PageBuilder from '../PageBuilder/pageBuilder';
 import FeatureComponent from '../Components/pages/feature';
-import { ModifierFlags } from 'typescript';
 import ModuleComponent from '../Components/pages/module';
 import UseCaseComponent from '../Components/pages/useCase';
 
@@ -16,8 +15,8 @@ type CopyResult =
 
 class SiteBuilder {
   private _config: Config;
-  private _indexNav: string = '';
   private _pages: string[] = [];
+  private _nav: string = '';
 
   constructor (config: DocGenConfig) {
     const configResult = Config.parse(config);
@@ -49,7 +48,7 @@ class SiteBuilder {
 
   private copyIndexHtmlAndCss (dirPath: string) {
     const indexDestFilePath = path.join(dirPath, 'index.html');
-    const indexResult = this.generateFile(`./${this._config.templateDirectory}/index.html`, indexDestFilePath, (input) => {return input.replace(/{{PAGE_NAV}}/g, this._indexNav);});
+    const indexResult = this.generateFile(`./${this._config.templateDirectory}/index.html`, indexDestFilePath, (input) => {return input.replace(/{{PAGE_NAV}}/g, this._nav);});
 
     if (indexResult.success === false) {
       console.error(indexResult.message);
@@ -90,12 +89,12 @@ class SiteBuilder {
   private setIndexNav () {
     const nav =  new PageNav();
     nav.setup(this._pages);
-    this._indexNav = nav.outerHTML;
+    this._nav = nav.outerHTML;
   }
 
   private buildPages () {
     const tree = TreeBuilder.build(this._config);
-    const pages = PageBuilder.buildPages(tree);
+    const pages = PageBuilder.buildPages(tree, this._nav);
 
     Object.entries(pages).forEach(([key, value]) => {
       this.createHtmlFromPage(key, value);

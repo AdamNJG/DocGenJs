@@ -1,7 +1,7 @@
 import ModuleComponent from '../../src/WebBuilder/Components/pages/module';
 import FeatureComponent from '../../src/WebBuilder/Components/pages/feature';
 import UseCaseComponent from '../../src/WebBuilder/Components/pages/useCase';
-import PageNav from '../../src/WebBuilder/Components/index/pageNav';
+import PageNav from '../../src/WebBuilder/Components/pageNav';
 
 function declareComponents (components: Record<string, CustomElementConstructor>) {
   Object.entries(components).forEach(([tagName, constructor]) => {

@@ -5,7 +5,7 @@ import ModuleComponent from '../Components/pages/module';
 
 class PageBuilder {
 
-  static buildPages (tree: InstructionTree): Record<string, string> {
+  static buildPages (tree: InstructionTree, nav: string): Record<string, string> {
     const renderedHtml: Record<string, string> = {};
     const templatePath = path.resolve('./templates/page.html');
     const template = fs.readFileSync(templatePath, 'utf-8');
@@ -15,7 +15,8 @@ class PageBuilder {
 
       const pageHtml = template
         .replace(/{{PAGE_TITLE}}/g, page.name)
-        .replace(/{{COMPONENTS}}/g, compiledPage);
+        .replace(/{{COMPONENTS}}/g, compiledPage)
+        .replace(/{{PAGE_NAV}}/g, nav);
 
       renderedHtml[page.name] = pageHtml;
     }

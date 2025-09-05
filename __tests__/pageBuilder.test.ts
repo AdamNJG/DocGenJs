@@ -4,12 +4,13 @@ import { defineComponents } from './helpers/componentHelper';
 import { testElement } from './helpers/elementHelper';
 
 import PageBuilder from '../src/WebBuilder/PageBuilder/pageBuilder';
+import PageNav from '../src/WebBuilder/Components/pageNav';
 
 describe('web builder', () => {
   defineComponents();
 
   test('pageBuilder is passed no pages, so no results', () => {
-    const pageResult = PageBuilder.buildPages({ pages: [] });
+    const pageResult = PageBuilder.buildPages({ pages: [] }, '');
 
     expect(Object.keys(pageResult)).toHaveLength(0);
   });
@@ -20,7 +21,7 @@ describe('web builder', () => {
       features: []
     };
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] });
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 
@@ -40,6 +41,44 @@ describe('web builder', () => {
     testElement(noFeatures, 'li', {}, 'No features yet');
   });
 
+  test('page has nav element and data', () => {
+    const page: Page = {
+      name: 'Test Page',
+      features: []
+    };
+
+    const navPages: Page[] = [
+      page,
+      { name: 'fake.test', features: [] },
+      { name: 'more.fake.test', features: [] },
+      { name: 'no.describe.fake.test', features: [] }
+    ];
+
+    const navComponent = new PageNav();
+    navComponent.setup(navPages.map(p => p.name));
+
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, navComponent.innerHTML);
+    expect(Object.keys(htmlPages)).toHaveLength(1);
+    const doc = buildDocumentFromHtml(htmlPages[page.name]);
+
+    expect(doc).not.toBeUndefined();
+    const nav = doc.querySelector('.pages-nav');
+    testElement(nav, 'nav', { 'aria-label': 'Pages navigation' });
+
+    const ul = nav?.querySelector('ul');
+    expect(ul).not.toBe(null);
+
+    navPages.forEach(page => {
+      const link = Array.from(ul?.querySelectorAll('li > a') || [])
+        .find(a => a.getAttribute('href') === `./${page.name}.html`);
+
+      expect(link).not.toBe(null);
+      expect(link?.textContent?.trim()).toBe(page.name);
+      const tabIndex = link?.getAttribute('tabindex');
+      expect(tabIndex === null || Number(tabIndex) >= 0).toBe(true);
+    });
+  });
+
   test('page component renders features with no use cases', () => {
     const page: Page = {
       name: 'Test Page',
@@ -49,7 +88,7 @@ describe('web builder', () => {
       }]
     };
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] });
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 
@@ -91,7 +130,7 @@ console.log(greet('World'));`
       }]
     };
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] });
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 

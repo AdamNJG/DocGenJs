@@ -1,4 +1,3 @@
-# Node modules (never publish)
 node_modules
 coverage
 __tests__
