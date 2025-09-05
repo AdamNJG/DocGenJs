@@ -36,7 +36,7 @@ describe('Components with invalid inputs', () => {
   test('undefined input for nav generates empty outerHTML', () => {
     const pageNav = new PageNav();
 
-    pageNav.setup({feature: undefined, index: 0});
+    pageNav.setup(pages: undefined);
 
    expect(pageNav.outerHTML).toBe('<page-nav></page-nav>');
   });
