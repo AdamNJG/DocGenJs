@@ -31,3 +31,12 @@ describe('Components with invalid inputs', () => {
     expect(feature.outerHTML).toBe('<feature-component></feature-component>');
   });
 });
+
+  test('undefined input for nav generates empty outerHTML', () => {
+    const feature = new FeatureComponent();
+
+    feature.setup({feature: undefined, index: 0});
+
+    expect(feature.outerHTML).toBe('<feature-component></feature-component>');
+  });
+});
