@@ -3,7 +3,7 @@ import UseCaseComponent from './useCase';
 import { ServerSideElement } from "./serverSideElement";
 
 
-class FeatureComponent extends HTMLElement {
+class FeatureComponent extends ServerSideElement {
   private _feature: Feature;
   private _index: number;
 
