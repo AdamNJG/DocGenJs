@@ -1,6 +1,6 @@
 import { Feature } from '../../../TreeBuilder/types';
 import UseCaseComponent from './useCase';
-import { ServerSideElement } from "./serverSideElement";
+import { ServerSideElement } from "../serverSideElement";
 
 
 class FeatureComponent extends ServerSideElement {
