@@ -26,23 +26,25 @@ async function runSiteBuilder () {
   siteBuilder.buildSite();
 }
 
-function pathToFileUrl (filePath: string): URL {
-  const resolved = path.resolve(filePath);
-  return new URL(`file://${resolved}?imported=${Date.now()}`);
-}
-
 async function loadConfig (): Promise<DocGenConfig | undefined> {
   const candidates = ['docgen.config.ts', 'docgen.config.js', 'docgen.config.json'];
+  const projectRoot = process.cwd();
+
   for (const file of candidates) {
-    if (fs.existsSync(file)) {
-      const ext = path.extname(file).toLowerCase();
+    const filePath = path.join(projectRoot, file);
+    if (fs.existsSync(filePath)) {
+      const ext = path.extname(filePath).toLowerCase();
 
       switch (ext) {
       case '.json':
+      {
+        const json = fs.readFileSync(filePath, 'utf-8');
+        return JSON.parse(json) as DocGenConfig;
+      }
       case '.js':
-        return (await import(pathToFileUrl(file).href)).default as DocGenConfig;
+        return (await import(filePath)).default as DocGenConfig;
       case '.ts':
-        return importTsConfig(file);
+        return importTsConfig(filePath);
       default:
         return undefined;
       }
