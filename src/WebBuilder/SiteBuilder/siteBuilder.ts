@@ -22,7 +22,10 @@ class SiteBuilder {
   constructor (config: DocGenConfig) {
     const configResult = Config.parse(config);
     if (configResult.validated === false) {
-      throw new Error('invalid config: ' + configResult.message);
+      console.error('\x1b[31m%s\x1b[0m', '❌ Invalid config:'); // red
+      console.error('  ' + configResult.message);               // indented message
+      console.error('  Please add a test folder to the `includes` array in your config.');
+      process.exit(1); // Exit with non-zero code
     }
     this._config = configResult.config;
     this.setupComponents();

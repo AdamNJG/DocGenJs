@@ -131,11 +131,18 @@ describe('SiteBuilder', () => {
   });
 
   test('passing in invalid config error displayed', () => {
-    const config: DocGenConfig = {
-      includes: ['']
-    };
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const config: DocGenConfig = {
+        includes: ['']
+      };
 
-    expect(() => new SiteBuilder(config)).toThrow('invalid config: Test folder specified not found, looking for ');
+      expect(() => new SiteBuilder(config)).toThrow('process.exit unexpectedly called with "1"');
+
+      expect(consoleSpy).toHaveBeenCalled();
+    } finally {
+      consoleSpy.mockRestore();
+    }
   });
 });
 

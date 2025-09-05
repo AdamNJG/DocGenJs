@@ -70,7 +70,7 @@ export default class Config {
   static validate (config: FilledConfig): ValidationResult {
     const files: string[] = [];
 
-    if (config.includes.length === 0) {
+    if (!config.includes || config.includes.length === 0) {
       return { validated: false, message: `Test folder not specified, please add one to the includes array of the config` };
     }
 
