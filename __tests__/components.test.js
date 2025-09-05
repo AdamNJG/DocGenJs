@@ -3,6 +3,7 @@ import { defineComponents } from './helpers/componentHelper';
 import UseCaseComponent from '../src/WebBuilder/Components/pages/useCase';
 import ModuleComponent from '../src/WebBuilder/Components/pages/module';
 import FeatureComponent from '../src/WebBuilder/Components/pages/feature';
+import PageNav from '../src/WebBuilder/Components/pageNav';
 
 describe('Components with invalid inputs', () => {
   defineComponents();
@@ -29,5 +30,14 @@ describe('Components with invalid inputs', () => {
     feature.setup({feature: undefined, index: 0});
 
     expect(feature.outerHTML).toBe('<feature-component></feature-component>');
+  });
+});
+
+  test('undefined input for nav generates empty outerHTML', () => {
+    const pageNav = new PageNav();
+
+    pageNav.setup(pages: undefined);
+
+   expect(pageNav.outerHTML).toBe('<page-nav></page-nav>');
   });
 });
