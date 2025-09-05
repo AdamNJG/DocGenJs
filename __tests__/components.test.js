@@ -3,6 +3,7 @@ import { defineComponents } from './helpers/componentHelper';
 import UseCaseComponent from '../src/WebBuilder/Components/pages/useCase';
 import ModuleComponent from '../src/WebBuilder/Components/pages/module';
 import FeatureComponent from '../src/WebBuilder/Components/pages/feature';
+import PageNav from '../src/WebBuilder/Components/pageNav';
 
 describe('Components with invalid inputs', () => {
   defineComponents();
@@ -33,10 +34,10 @@ describe('Components with invalid inputs', () => {
 });
 
   test('undefined input for nav generates empty outerHTML', () => {
-    const feature = new FeatureComponent();
+    const pageNav = new PageNav();
 
-    feature.setup({feature: undefined, index: 0});
+    pageNav.setup({feature: undefined, index: 0});
 
-    expect(feature.outerHTML).toBe('<feature-component></feature-component>');
+   expect(pageNav.outerHTML).toBe('<page-nav></page-nav>');
   });
 });
