@@ -1,41 +1,39 @@
-import { Feature } from '../../../TreeBuilder/types';
-import UseCaseComponent from './useCase';
+type Node = string | ServerSideComponent;
 
-class FeatureComponent extends HTMLElement {
-  private _feature: Feature;
-  private _index: number;
+export class ServerSideComponent {
+  children: Node[] = [];
+  innerHTMLContent: string = "";
 
-  setup ({ feature, index }: {feature: Feature, index: number}) {
-    this._feature = feature;
-    this._index = index;
-    this.render();
+  constructor() {}
+
+  // Drop-in replacement for HTMLElement.appendChild
+  appendChild(child: Node) {
+    this.children.push(child);
   }
 
-  private render () {
-    if (!this._feature) {
-      this.innerHTML = '';
-      return;
-    }
-
-    this.innerHTML = `<article class="feature-component" role="region" aria-labelledby="feature-${this._index}-title">
-      <h2 id="feature-${this._index}-title">${this._feature.name}</h2>
-      <ul class="use-cases" aria-label="Use Cases">
-      </ul>
-    </article>`;
-
-    const useCaseContainer = this.querySelector('.use-cases');
-
-    if (this._feature.useCases.length === 0) {
-      useCaseContainer.innerHTML = '<li class="no-use-cases">No use cases yet</li>';
-    } else {
-      this._feature.useCases.forEach((useCase, index) => {
-        const incrementedIndex = index + 1;
-        const useCaseEl = new UseCaseComponent();
-        useCaseEl.setup({ useCase, index: incrementedIndex });
-        useCaseContainer.appendChild(useCaseEl);
-      });
-    }
+  // Drop-in replacement for HTMLElement.innerHTML setter
+  set innerHTML(html: string) {
+    this.children = [];
+    this.innerHTMLContent = html;
   }
+
+  get innerHTML(): string {
+    return this.innerHTMLContent;
+  }
+
+  // Returns the full HTML string for this component and its children
+  get outerHTML(): string {
+    if (this.innerHTMLContent) {
+      return this.innerHTMLContent;
+    }
+    return this.children
+      .map(child => (typeof child === "string" ? child : child.outerHTML))
+      .join("");
+  }
+
+  // Lifecycle hook you can override
+  connectedCallback() {}
+
+  // Optional setup method (like your existing components)
+  setup(props: Record<string, any>) {}
 }
-
-export default FeatureComponent;
