@@ -2,7 +2,7 @@ import { Page } from '../../../TreeBuilder/types';
 import FeatureComponent from './feature';
 
 class ModuleComponent extends HTMLElement {
-  private _page: Page;
+  private _page: Page | undefined;
 
   setup (value: Page) {
     this._page = value;
@@ -24,7 +24,9 @@ class ModuleComponent extends HTMLElement {
         </section>
       </article>`;
 
-    const featureContainer = this.querySelector('.features').querySelector('ul');
+    const featureContainer = this.querySelector('.features')?.querySelector('ul');
+
+    if (!featureContainer) return;
 
     if (this._page.features.length === 0) {
       featureContainer.innerHTML = `<li class="no-features">No features yet</li>`;

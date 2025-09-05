@@ -5,6 +5,10 @@ import * as path from 'path';
 import PageNav from '../Components/index/pageNav';
 import TreeBuilder from '../../TreeBuilder/treeBuilder';
 import PageBuilder from '../PageBuilder/pageBuilder';
+import FeatureComponent from '../Components/pages/feature';
+import { ModifierFlags } from 'typescript';
+import ModuleComponent from '../Components/pages/module';
+import UseCaseComponent from '../Components/pages/useCase';
 
 type CopyResult =
   | { success: true; }
@@ -21,6 +25,7 @@ class SiteBuilder {
       throw new Error('invalid config: ' + configResult.message);
     }
     this._config = configResult.config;
+    this.setupComponents();
   }
 
   buildSite () {
@@ -104,6 +109,20 @@ class SiteBuilder {
       console.error(`Error saving html file: ${pageName}.html, Error: ${err}`);
     }
   }
+
+  private async setupComponents () {
+
+    this.declareComponents({ 'page-nav': PageNav, 'feature-component': FeatureComponent, 'module-component' : ModuleComponent, 'use-case-component': UseCaseComponent });
+  }
+  
+  private declareComponents (components: Record<string, CustomElementConstructor>) {
+    Object.entries(components).forEach(([tagName, constructor]) => {
+      if (!customElements.get(tagName)) {
+        customElements.define(tagName, constructor);
+      }
+    });
+  }
+  
 }
 
 export default SiteBuilder;

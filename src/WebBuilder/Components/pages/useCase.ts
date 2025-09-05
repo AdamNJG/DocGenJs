@@ -1,8 +1,8 @@
 import { UseCase } from '../../../TreeBuilder/types';
 
 class UseCaseComponent extends HTMLElement {
-  private _useCase: UseCase;
-  private _index: number;
+  private _useCase: UseCase | undefined;
+  private _index: number | undefined;
 
   setup ({ useCase, index }: {useCase: UseCase, index: number}) {
     this._useCase = useCase;

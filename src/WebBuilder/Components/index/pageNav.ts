@@ -1,6 +1,6 @@
 
 class PageNav extends HTMLElement {
-  private _pages: string[];
+  private _pages: string[] | undefined;
 
   setup (pages: string[]) {
     this._pages = pages;
@@ -18,6 +18,8 @@ class PageNav extends HTMLElement {
     </nav>`;
 
     const linkContainer = this.querySelector('.page-links');
+
+    if (!linkContainer) return;
 
     this._pages.forEach((page: string) => {
       const li = document.createElement('li');

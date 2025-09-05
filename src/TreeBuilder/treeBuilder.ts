@@ -3,7 +3,8 @@ import { Feature, InstructionTree, Page, UseCase } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
 import { parse } from '@babel/parser';
-import _traverse from '@babel/traverse';
+import * as t from '@babel/types';
+import _traverse, { NodePath } from '@babel/traverse';
 //@ts-expect-error this is a workaround for getting babel working with multiple exports
 const traverse =  typeof _traverse === 'function' ? _traverse : _traverse.default;
 
@@ -11,7 +12,7 @@ export default class TreeBuilder {
   static build (config: Config): InstructionTree {
     const pages: Page[] = config.files.map((f: string) => {
       return {
-        name: this.getPageName(f, config.testSuffixToRemove),
+        name: this.getPageName(f, config.testSuffixToRemove ?? ''),
         features: this.getFeatures(f, config)
       };
     });
@@ -30,37 +31,45 @@ export default class TreeBuilder {
     const content = fs.readFileSync(filePath, 'utf-8');
     const ast = parse(content, { sourceType: 'module', plugins: ['typescript'] });
 
-    const features = [];
+    const features: Feature[] = [];
 
     traverse(ast, {
-      CallExpression (path) {
+      CallExpression (path: NodePath<t.CallExpression>) {
         const callee = path.node.callee;
         
-        if (callee.type === 'Identifier' && callee.name === (config.describeFunctionName)) {
-          const featureName = path.node.arguments[0].value;
-          
-          const describeBody = path.node.arguments[1].body.body;
-          const useCases: UseCase[] = TreeBuilder.getUseCases(describeBody, content, config);
+        if (t.isIdentifier(callee) && callee.name === (config.describeFunctionName)) {
+          const args = path.node.arguments;
+          if (t.isStringLiteral(args[0])) {
+            const featureName = args[0].value;
 
-          features.push({ name: featureName, useCases: useCases });
+            if (t.isFunctionExpression(args[1]) || t.isArrowFunctionExpression(args[1])) {
+              const describeBody = t.isBlockStatement(args[1].body) ? args[1].body.body : '';
+              const useCases: UseCase[] = TreeBuilder.getUseCases(describeBody, content, config);
+
+              features.push({ name: featureName, useCases: useCases });
+            }
+          }
         } 
         
-        if (callee.type === 'Identifier' && callee.name === (config.testFunctionName) && !path.findParent(p => p.isCallExpression() && p.node.callee.type === 'Identifier' && p.node.callee.name === config.describeFunctionName)) {
-          const pageName = TreeBuilder.getPageName(filePath, config.testSuffixToRemove);
-          
-          const useCases: UseCase[] = [{
-            name: path.node.arguments[0].value,
-            codeExample: content.slice(path.node.arguments[1].body.start + 1,
-              path.node.arguments[1].body.end - 1)
-          }];
+        if (t.isIdentifier(callee) && callee.name === (config.testFunctionName) && !path.findParent(p => p.isCallExpression() && p.node.callee.type === 'Identifier' && p.node.callee.name === config.describeFunctionName)) {
+          const pageName = TreeBuilder.getPageName(filePath, config.testSuffixToRemove ?? '');
+          const args = path.node.arguments;
 
-          const alreadyFeature = features.find(f => f.name === pageName);
-          if (alreadyFeature) {
-            alreadyFeature.useCases = [ ...alreadyFeature.useCases, ...useCases ];
-            return;
+          if (args.length >= 2 && t.isStringLiteral(args[0]) && (t.isFunctionExpression(args[1]) || t.isArrowFunctionExpression(args[1])) && t.isBlockStatement(args[1].body) && (args[1].body.start && args[1].body.end)) {
+            const useCases: UseCase[] = [{
+              name: args[0].value,
+              codeExample: content.slice(args[1].body.start + 1,
+                args[1].body.end - 1)
+            }];
+
+            const alreadyFeature = features.find(f => f.name === pageName);
+            if (alreadyFeature) {
+              alreadyFeature.useCases = [ ...alreadyFeature.useCases, ...useCases ];
+              return;
+            }
+
+            features.push({ name: pageName, useCases: useCases });
           }
-
-          features.push({ name: pageName, useCases: useCases });
         }
       }
     });
@@ -68,18 +77,28 @@ export default class TreeBuilder {
     return features;
   }
 
-  static getUseCases (describeBody, content: string, config: Config) {
+  static getUseCases (describeBody: '' | t.Statement[], content: string, config: Config) {
     const useCases: UseCase[] = [];
 
-    describeBody.forEach(statement => {
-      if (statement.type === 'ExpressionStatement' && 
-              statement.expression.callee.name === (config.testFunctionName)) {
-        const testNode = statement.expression;
+    if (describeBody === '') return useCases;
+    
+    describeBody.forEach(statement => {    
+      if (t.isExpressionStatement(statement) && 
+        t.isCallExpression(statement.expression) &&
+        t.isIdentifier(statement.expression.callee) &&
+        statement.expression.callee.name === config.testFunctionName) {
+        const args = statement.expression.arguments;
 
-        useCases.push({
-          name: testNode.arguments[0].value,
-          codeExample: content.slice(testNode.arguments[1].body.start + 1, testNode.arguments[1].body.end - 1)
-        });
+        if (args.length >= 2 && 
+          t.isStringLiteral(args[0]) &&
+          (t.isFunctionExpression(args[1]) || t.isArrowFunctionExpression(args[1])) 
+          && t.isBlockStatement(args[1].body) && 
+          (args[1].body.start && args[1].body.end)) {
+          useCases.push({
+            name: args[0].value,
+            codeExample: content.slice(args[1].body.start + 1, args[1].body.end - 1)
+          });
+        }
       }
     });
 

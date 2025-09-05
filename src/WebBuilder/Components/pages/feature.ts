@@ -2,8 +2,8 @@ import { Feature } from '../../../TreeBuilder/types';
 import UseCaseComponent from './useCase';
 
 class FeatureComponent extends HTMLElement {
-  private _feature: Feature;
-  private _index: number;
+  private _feature: Feature | undefined;
+  private _index: number | undefined;
 
   setup ({ feature, index }: {feature: Feature, index: number}) {
     this._feature = feature;
@@ -24,6 +24,8 @@ class FeatureComponent extends HTMLElement {
     </article>`;
 
     const useCaseContainer = this.querySelector('.use-cases');
+
+    if (!useCaseContainer) return;
 
     if (this._feature.useCases.length === 0) {
       useCaseContainer.innerHTML = '<li class="no-use-cases">No use cases yet</li>';
