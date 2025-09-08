@@ -31,13 +31,13 @@ describe('Components with invalid inputs', () => {
 
     expect(feature.outerHTML).toBe('<feature-component></feature-component>');
   });
-});
-
+  
   test('undefined input for nav generates empty outerHTML', () => {
     const pageNav = new PageNav();
 
-    pageNav.setup(pages: undefined);
+    pageNav.setup(undefined);
 
    expect(pageNav.outerHTML).toBe('<page-nav></page-nav>');
   });
+
 });
