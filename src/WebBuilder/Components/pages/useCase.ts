@@ -1,4 +1,8 @@
 import { UseCase } from '../../../TreeBuilder/types';
+import Prism from 'prismjs';
+import loadLanguages from 'prismjs/components/';
+
+loadLanguages(['typescript']);
 
 class UseCaseComponent extends HTMLElement {
   private _useCase: UseCase | undefined;
@@ -16,9 +20,11 @@ class UseCaseComponent extends HTMLElement {
       return;
     }
 
+    const highlighted = Prism.highlight(this._useCase.codeExample, Prism.languages.typescript ,'typescript');
+
     this.innerHTML = `<li class="use-case" aria-labeledby="usecase-${this._index}-title">
       <h3 id="usecase-${this._index}-title">${this._useCase.name}</h3>
-      <pre><code class="language-ts">${this._useCase.codeExample}</code></pre>
+      <pre class="code-block"><code>${highlighted}</code></pre>
     </li>`;
   }
 }

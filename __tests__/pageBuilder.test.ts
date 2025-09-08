@@ -68,6 +68,11 @@ describe('web builder', () => {
     const ul = nav?.querySelector('ul');
     expect(ul).not.toBe(null);
 
+    const links = Array.from(ul?.querySelectorAll('li > a') || []);
+
+    expect(links[0].getAttribute('href')).toBe('./index.html');
+    expect(links[0].textContent?.trim()).toBe('index');
+
     navPages.forEach(page => {
       const link = Array.from(ul?.querySelectorAll('li > a') || [])
         .find(a => a.getAttribute('href') === `./${page.name}.html`);
@@ -157,8 +162,8 @@ console.log(greet('World'));`
     const useCasePre = useCase.querySelector('pre');
     testElement(useCasePre, 'pre', {});
 
-    const useCaseCode = useCase.querySelector('.language-ts');
-    testElement(useCaseCode, 'code', {}, page.features[0].useCases[0].codeExample);
+    const useCaseCode = useCase.querySelector('.code-block');
+    testElement(useCaseCode, 'pre', {}, page.features[0].useCases[0].codeExample);
   });
 });
 
