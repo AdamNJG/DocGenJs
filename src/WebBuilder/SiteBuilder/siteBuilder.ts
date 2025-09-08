@@ -8,15 +8,21 @@ import PageBuilder from '../PageBuilder/pageBuilder';
 import FeatureComponent from '../Components/pages/feature';
 import ModuleComponent from '../Components/pages/module';
 import UseCaseComponent from '../Components/pages/useCase';
+import { InstructionTree } from '../../TreeBuilder/types';
 
 type CopyResult =
   | { success: true; }
   | { success: false; message: string};
 
+type TreeResult = 
+  | { success: true; tree: InstructionTree}
+  | { success: false; };
+
 class SiteBuilder {
   private _config: Config;
   private _pages: string[] = [];
   private _nav: string = '';
+  private _tree: TreeResult = { success: false };
 
   constructor (config: DocGenConfig) {
     const configResult = Config.parse(config);
@@ -32,9 +38,11 @@ class SiteBuilder {
 
   buildSite () {
     this.ensureDocumentationDirectoryIsClean(this._config.outputDirectory);
-    this.buildPages();
 
-    this.setIndexNav();
+    this.buildTree();
+
+    this.setNav();
+    this.buildPages();
     
     this.copyIndexHtmlAndCss(this._config.outputDirectory);
   }
@@ -86,15 +94,28 @@ class SiteBuilder {
     } 
   }
 
-  private setIndexNav () {
+  private setNav () {
+    if (this._tree.success == false) {
+      this._nav = '';
+      return;
+    }
+
     const nav =  new PageNav();
-    nav.setup(this._pages);
+    nav.setup(this._tree.tree.pages.map(p => p.name));
     this._nav = nav.outerHTML;
   }
 
-  private buildPages () {
+  private buildTree () {
     const tree = TreeBuilder.build(this._config);
-    const pages = PageBuilder.buildPages(tree, this._nav);
+    this._tree= { success: true, tree: tree };
+  }
+
+  private buildPages () {
+    if (this._tree.success == false) {
+      this._pages = [];
+      return;
+    }
+    const pages = PageBuilder.buildPages(this._tree.tree, this._nav);
 
     Object.entries(pages).forEach(([key, value]) => {
       this.createHtmlFromPage(key, value);

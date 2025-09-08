@@ -21,6 +21,8 @@ class PageNav extends HTMLElement {
 
     if (!linkContainer) return;
 
+    this._pages.unshift('index');
+
     this._pages.forEach((page: string) => {
       const li = document.createElement('li');
       
