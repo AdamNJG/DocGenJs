@@ -162,8 +162,8 @@ console.log(greet('World'));`
     const useCasePre = useCase.querySelector('pre');
     testElement(useCasePre, 'pre', {});
 
-    const useCaseCode = useCase.querySelector('.language-ts');
-    testElement(useCaseCode, 'code', {}, page.features[0].useCases[0].codeExample);
+    const useCaseCode = useCase.querySelector('.code-block');
+    testElement(useCaseCode, 'pre', {}, page.features[0].useCases[0].codeExample);
   });
 });
 
