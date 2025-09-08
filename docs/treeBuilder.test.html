@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>treeBuilder.test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <page-nav><nav class="pages-nav" aria-label="Pages navigation">
+      <ul class="page-links"><li><a href="./index.html">index</a></li><li><a href="./components.test.html">components.test</a></li><li><a href="./config.test.html">config.test</a></li><li><a href="./pageBuilder.test.html">pageBuilder.test</a></li><li><a href="./runSiteBuilder.test.html">runSiteBuilder.test</a></li><li><a href="./treeBuilder.test.html">treeBuilder.test</a></li></ul>
+    </nav></page-nav>
+  <header>
+    <h1>treeBuilder.test</h1>
+  </header>
+
+  <main id="content">
+    <module-component>
+      <article class="module-component" role="region" aria-labelledby="module-title">
+        <h1 id="module-title">treeBuilder.test</h1>
+        <section class="features" aria-label="Features">
+          <ul>
+          <li id="feature-1" class="feature-container"><feature-component><article class="feature-component" role="region" aria-labelledby="feature-1-title">
+      <h2 id="feature-1-title">tree builder</h2>
+      <ul class="use-cases" aria-label="Use Cases">
+      <use-case-component><li class="use-case" aria-labeledby="usecase-1-title">
+      <h3 id="usecase-1-title">creates tree with renamed functions and keeps ".test" suffix</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token function">BuildConfig</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+      includes<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'__tests__/treeBuilderFakeTestsRenames'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      testFunctionNameOverride<span class="token operator">:</span> <span class="token string">'testProxy'</span><span class="token punctuation">,</span>
+      describeFunctionNameOverride<span class="token operator">:</span> <span class="token string">'describeProxy'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> tree <span class="token operator">=</span> TreeBuilder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> page <span class="token operator">=</span> tree<span class="token punctuation">.</span>pages<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkPage</span><span class="token punctuation">(</span>page<span class="token punctuation">,</span> <span class="token string">'fake.test'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> feature <span class="token operator">=</span> page<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>feature<span class="token punctuation">,</span> <span class="token string">'this is a fake description'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase <span class="token operator">=</span> feature<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase<span class="token punctuation">,</span> <span class="token string">'this is a fake test'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  </code></pre>
+    </li></use-case-component><use-case-component><li class="use-case" aria-labeledby="usecase-2-title">
+      <h3 id="usecase-2-title">creates tree with renamed functions and removes "test" suffix</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token function">BuildConfig</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+      includes<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'__tests__/treeBuilderFakeTestsRenames'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      testFunctionNameOverride<span class="token operator">:</span> <span class="token string">'testProxy'</span><span class="token punctuation">,</span>
+      describeFunctionNameOverride<span class="token operator">:</span> <span class="token string">'describeProxy'</span><span class="token punctuation">,</span>
+      testSuffixToRemove<span class="token operator">:</span> <span class="token string">'test'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> tree <span class="token operator">=</span> TreeBuilder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> page <span class="token operator">=</span> tree<span class="token punctuation">.</span>pages<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkPage</span><span class="token punctuation">(</span>page<span class="token punctuation">,</span> <span class="token string">'fake'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  </code></pre>
+    </li></use-case-component><use-case-component><li class="use-case" aria-labeledby="usecase-3-title">
+      <h3 id="usecase-3-title">creates tree with default config and keeps ".test" suffix</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token function">BuildConfig</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+      includes<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'./__tests__/treeBuilderFakeTests'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      testFunctionNameOverride<span class="token operator">:</span> <span class="token string">'test'</span><span class="token punctuation">,</span> 
+      describeFunctionNameOverride<span class="token operator">:</span> <span class="token string">'describe'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> tree <span class="token operator">=</span> TreeBuilder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">expect</span><span class="token punctuation">(</span>tree<span class="token punctuation">.</span>pages<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> page1 <span class="token operator">=</span> tree<span class="token punctuation">.</span>pages<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">expect</span><span class="token punctuation">(</span>page1<span class="token punctuation">.</span>features<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">checkPage</span><span class="token punctuation">(</span>page1<span class="token punctuation">,</span> <span class="token string">'fake.test'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> featureForPage1 <span class="token operator">=</span> page1<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>featureForPage1<span class="token punctuation">,</span> <span class="token string">'this is a fake description'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCaseFeaturePage1 <span class="token operator">=</span> featureForPage1<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCaseFeaturePage1<span class="token punctuation">,</span> <span class="token string">'this is a fake test'</span><span class="token punctuation">,</span>  codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> page2 <span class="token operator">=</span> tree<span class="token punctuation">.</span>pages<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkPage</span><span class="token punctuation">(</span>page2<span class="token punctuation">,</span> <span class="token string">'more.fake.test'</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">expect</span><span class="token punctuation">(</span>page2<span class="token punctuation">.</span>features<span class="token punctuation">.</span><span class="token function">some</span><span class="token punctuation">(</span>f <span class="token operator">=&gt;</span> f<span class="token punctuation">.</span>name <span class="token operator">===</span> <span class="token string">'this should not be a test'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBeFalsy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+    <span class="token keyword">const</span> feature1Page2 <span class="token operator">=</span> page2<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>feature1Page2<span class="token punctuation">,</span> <span class="token string">'this is a fake description'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCaseFeature1Page2 <span class="token operator">=</span> feature1Page2<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCaseFeature1Page2<span class="token punctuation">,</span> <span class="token string">'this is a fake test'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> feature2Page2 <span class="token operator">=</span> page2<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>feature2Page2<span class="token punctuation">,</span> <span class="token string">'this is another fake description'</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase1Feature2Page2 <span class="token operator">=</span> feature2Page2<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase1Feature2Page2<span class="token punctuation">,</span> <span class="token string">'this is a fake test in another fake description'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase2Feature2Page2 <span class="token operator">=</span> feature2Page2<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase2Feature2Page2<span class="token punctuation">,</span> <span class="token string">'this is another fake test in another fake description'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </code></pre>
+    </li></use-case-component><use-case-component><li class="use-case" aria-labeledby="usecase-4-title">
+      <h3 id="usecase-4-title">creates tree with default config and top level test statements</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token function">BuildConfig</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+      includes<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'__tests__/treeBuilderFakeTests'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      testFunctionNameOverride<span class="token operator">:</span> <span class="token string">'test'</span><span class="token punctuation">,</span> 
+      describeFunctionNameOverride<span class="token operator">:</span> <span class="token string">'describe'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> tree <span class="token operator">=</span> TreeBuilder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">expect</span><span class="token punctuation">(</span>tree<span class="token punctuation">.</span>pages<span class="token punctuation">.</span>length<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> page3 <span class="token operator">=</span> tree<span class="token punctuation">.</span>pages<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkPage</span><span class="token punctuation">(</span>page3<span class="token punctuation">,</span> <span class="token string">'no.describe.fake.test'</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> feature1Page3 <span class="token operator">=</span> page3<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>feature1Page3<span class="token punctuation">,</span> <span class="token string">'non orphaned fake tests'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase1Feature1Page3 <span class="token operator">=</span> feature1Page3<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase1Feature1Page3<span class="token punctuation">,</span> <span class="token string">'this is a non orphaned fake test'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> feature2Page3 <span class="token operator">=</span> page3<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>feature2Page3<span class="token punctuation">,</span> <span class="token string">'no.describe.fake.test'</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase1Feature2Page3 <span class="token operator">=</span> feature2Page3<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase1Feature2Page3<span class="token punctuation">,</span> <span class="token string">'this is a fake test'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase2Feature2Page3 <span class="token operator">=</span> feature2Page3<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase2Feature2Page3<span class="token punctuation">,</span> <span class="token string">'this is another fake test'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> feature3Page3 <span class="token operator">=</span> page3<span class="token punctuation">.</span>features<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkFeature</span><span class="token punctuation">(</span>feature3Page3<span class="token punctuation">,</span> <span class="token string">'more non orphaned fake tests'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> useCase1Feature3Page3 <span class="token operator">=</span> feature3Page3<span class="token punctuation">.</span>useCases<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">checkUseCase</span><span class="token punctuation">(</span>useCase1Feature3Page3<span class="token punctuation">,</span> <span class="token string">'this is another non orphaned fake test'</span><span class="token punctuation">,</span> codeExample<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </code></pre>
+    </li></use-case-component></ul>
+    </article></feature-component></li></ul>
+        </section>
+      </article></module-component>
+  </main>
+
+  <footer>
+    <p>© 2025 Generated by DocGenJS</p>
+  </footer>
+</body>
+</html>

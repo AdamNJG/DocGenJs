@@ -30,7 +30,6 @@ body {
 
 #content, header, footer {
   margin-left: var(--nav-width);     
-  width: 30%;
 }
 
 pre.code-block {

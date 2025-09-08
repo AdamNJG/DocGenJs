@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>components.test</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <page-nav><nav class="pages-nav" aria-label="Pages navigation">
+      <ul class="page-links"><li><a href="./index.html">index</a></li><li><a href="./components.test.html">components.test</a></li><li><a href="./config.test.html">config.test</a></li><li><a href="./pageBuilder.test.html">pageBuilder.test</a></li><li><a href="./runSiteBuilder.test.html">runSiteBuilder.test</a></li><li><a href="./treeBuilder.test.html">treeBuilder.test</a></li></ul>
+    </nav></page-nav>
+  <header>
+    <h1>components.test</h1>
+  </header>
+
+  <main id="content">
+    <module-component>
+      <article class="module-component" role="region" aria-labelledby="module-title">
+        <h1 id="module-title">components.test</h1>
+        <section class="features" aria-label="Features">
+          <ul>
+          <li id="feature-1" class="feature-container"><feature-component><article class="feature-component" role="region" aria-labelledby="feature-1-title">
+      <h2 id="feature-1-title">Components with invalid inputs</h2>
+      <ul class="use-cases" aria-label="Use Cases">
+      <use-case-component><li class="use-case" aria-labeledby="usecase-1-title">
+      <h3 id="usecase-1-title">undefined input for useCase generates empty outerHTML</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> useCase <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">UseCaseComponent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    useCase<span class="token punctuation">.</span><span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">{</span>useCase<span class="token operator">:</span> <span class="token keyword">undefined</span><span class="token punctuation">,</span> index<span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">expect</span><span class="token punctuation">(</span>useCase<span class="token punctuation">.</span>outerHTML<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token string">'&lt;use-case-component&gt;&lt;/use-case-component&gt;'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </code></pre>
+    </li></use-case-component><use-case-component><li class="use-case" aria-labeledby="usecase-2-title">
+      <h3 id="usecase-2-title">undefined input for module generates empty outerHTML</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> module <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ModuleComponent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    module<span class="token punctuation">.</span><span class="token function">setup</span><span class="token punctuation">(</span><span class="token keyword">undefined</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">expect</span><span class="token punctuation">(</span>module<span class="token punctuation">.</span>outerHTML<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token string">'&lt;module-component&gt;&lt;/module-component&gt;'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </code></pre>
+    </li></use-case-component><use-case-component><li class="use-case" aria-labeledby="usecase-3-title">
+      <h3 id="usecase-3-title">undefined input for feature generates empty outerHTML</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> feature <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FeatureComponent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    feature<span class="token punctuation">.</span><span class="token function">setup</span><span class="token punctuation">(</span><span class="token punctuation">{</span>feature<span class="token operator">:</span> <span class="token keyword">undefined</span><span class="token punctuation">,</span> index<span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">expect</span><span class="token punctuation">(</span>feature<span class="token punctuation">.</span>outerHTML<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token string">'&lt;feature-component&gt;&lt;/feature-component&gt;'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </code></pre>
+    </li></use-case-component><use-case-component><li class="use-case" aria-labeledby="usecase-4-title">
+      <h3 id="usecase-4-title">undefined input for nav generates empty outerHTML</h3>
+      <pre class="code-block"><code>
+    <span class="token keyword">const</span> pageNav <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PageNav</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    pageNav<span class="token punctuation">.</span><span class="token function">setup</span><span class="token punctuation">(</span><span class="token keyword">undefined</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+   <span class="token function">expect</span><span class="token punctuation">(</span>pageNav<span class="token punctuation">.</span>outerHTML<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBe</span><span class="token punctuation">(</span><span class="token string">'&lt;page-nav&gt;&lt;/page-nav&gt;'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </code></pre>
+    </li></use-case-component></ul>
+    </article></feature-component></li></ul>
+        </section>
+      </article></module-component>
+  </main>
+
+  <footer>
+    <p>© 2025 Generated by DocGenJS</p>
+  </footer>
+</body>
+</html>
