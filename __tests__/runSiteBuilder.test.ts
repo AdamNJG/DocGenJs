@@ -158,7 +158,7 @@ describe('SiteBuilder', () => {
 
       await runSiteBuilder();
 
-      expect(consoleSpy.mock.calls[0][0]).toContain('Using default configuration. You can create a docgen.config.ts/js file to customise future runs.');
+      expect(consoleSpy.mock.calls.some(call => call[0].includes('Using default configuration. You can create a docgen.config.ts/js file to customise future runs.'))).toBe(true);
       
       expect(fs.existsSync(outputDirectory)).toBe(true);
       expectGeneratedFiles(outputDirectory, expectedFiles);

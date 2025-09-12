@@ -48,9 +48,13 @@ export default class Config {
 
     const validationResult = Config.validate(updatedConfig);
 
-    return validationResult.validated === true ? 
-      { validated: true, config: new Config(updatedConfig, validationResult.files) } 
-      : validationResult;
+    if (!validationResult.validated) {
+      return validationResult;
+    }
+
+    console.log('Config found and parsed successfully');
+
+    return { validated: true, config: new Config(updatedConfig, validationResult.files) };
   }
 
   static applyDefaults (config: DocGenConfig) : FilledConfig {

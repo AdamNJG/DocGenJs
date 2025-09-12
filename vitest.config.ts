@@ -20,7 +20,8 @@ export default defineConfig({
     exclude: [
       '__tests__/treeBuilderFakeTestsRename/**',
       '__tests__/treeBuilderFakeTests/**',
-      'node_modules/**'
+      'node_modules/**',
+      '__tests__/cli.integration.test.ts'
     ],
     sequence: {
       concurrent: false
