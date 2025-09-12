@@ -65,7 +65,7 @@ export default class Config {
       describeFunctionNameOverride: config.describeFunctionNameOverride ?? 'describe', 
       testFunctionNameOverride: config.testFunctionNameOverride ?? 'test',
       outputDirectory: config.outputDirectory ?? './docs',
-      templateDirectory: config.templateDirectory ?? './templates',
+      templateDirectory: config.templateDirectory ?? './Templates',
       excludes: config.excludes ?? [],
       additionalFileExtensions: [...defaultFileExtensions, ...(config.additionalFileExtensions ?? [])]
     };
