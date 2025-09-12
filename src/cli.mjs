@@ -5,8 +5,7 @@ const require = createRequire(import.meta.url);
 
 async function main () {
   await startDom();
-
-  // Explicitly import the CJS builder
+ 
   const runSiteBuilder = require('./Cli/runSiteBuilder.cjs');
   await runSiteBuilder.default();
 }

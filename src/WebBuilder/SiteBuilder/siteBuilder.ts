@@ -45,6 +45,7 @@ class SiteBuilder {
     this.buildPages();
     
     this.copyIndexHtmlAndCss(this._config.outputDirectory);
+    console.log(`Generation completed, you can find your files at ${this._config.outputDirectory}`);
   }
 
   private ensureDocumentationDirectoryIsClean (dirPath: string) {
@@ -61,7 +62,7 @@ class SiteBuilder {
     if (indexResult.success === false) {
       console.error(indexResult.message);
     } else {
-      console.log(`file generated in: ${indexDestFilePath}`);
+      console.log(`File generated in: ${indexDestFilePath}`);
     }
 
     const cssDestFilePath = path.join(dirPath, 'styles.css');
@@ -70,7 +71,7 @@ class SiteBuilder {
     if (cssResult.success === false) {
       console.error(cssResult.message);
     } else {
-      console.log(`file generated in: ${cssDestFilePath}`);
+      console.log(`File generated in: ${cssDestFilePath}`);
     }
   }
 
@@ -116,7 +117,7 @@ class SiteBuilder {
       return;
     }
     const pages = PageBuilder.buildPages(this._tree.tree, this._nav);
-
+    console.log(`Found ${Object.keys(pages).length} test files`);
     Object.entries(pages).forEach(([key, value]) => {
       this.createHtmlFromPage(key, value);
     });
@@ -128,6 +129,7 @@ class SiteBuilder {
     try {
       const outputDir = path.join(this._config.outputDirectory, `${pageName}.html`);
       fs.writeFileSync(outputDir, page,'utf-8');
+      console.log(`File generated in: ${outputDir}`);
     } catch (err) {
       console.error(`Error saving html file: ${pageName}.html, Error: ${err}`);
     }
@@ -145,7 +147,6 @@ class SiteBuilder {
       }
     });
   }
-  
 }
 
 export default SiteBuilder;

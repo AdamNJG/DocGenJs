@@ -140,6 +140,7 @@ describe('get files', () => {
         path.relative(process.cwd(), file).replace(/\\/g, '/'));
 
       expect(relativeFiles).toStrictEqual([
+        '__tests__/cli.test.ts',
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
         '__tests__/configs/docgen.config.js',
@@ -179,6 +180,7 @@ describe('get files', () => {
         path.relative(process.cwd(), file).replace(/\\/g, '/'));
 
       expect(relativeFiles).toStrictEqual([
+        '__tests__/cli.test.ts',
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
         '__tests__/configs/docgen.config.js',
@@ -209,6 +211,7 @@ describe('get files', () => {
         path.relative(process.cwd(), file).replace(/\\/g, '/'));
 
       expect(relativeFiles).toStrictEqual([
+        '__tests__/cli.test.ts',
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
         '__tests__/configs/docgen.config.js',
@@ -242,6 +245,7 @@ describe('get files', () => {
         path.relative(process.cwd(), file).replace(/\\/g, '/'));
 
       expect(relativeFiles).toStrictEqual([
+        '__tests__/cli.test.ts',
         '__tests__/components.test.js',
         '__tests__/config.test.ts',
         '__tests__/configs/docgen.config.js',

@@ -18,6 +18,7 @@
     "build:cli": "cp src/cli.mjs dist/cli.mjs",
     "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp && rimraf ./reports && rimraf ./coverage",
     "test": "vitest run --coverage",
+    "test:cli": "npm run build && npx vitest run cli.integration.test.ts",
     "test:mutation": "npx stryker run && rimraf ./.stryker-tmp"
   },
   "keywords": [],
@@ -40,6 +41,7 @@
     "@typescript-eslint/parser": "^8.42.0",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.34.0",
+    "execa": "^9.6.0",
     "jiti": "^2.5.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",

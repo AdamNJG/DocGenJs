@@ -7,6 +7,7 @@ import ts from 'typescript';
 import vm from 'vm';
 
 async function runSiteBuilder () {
+  console.log('DocGen starting');
 
   const configFile = await loadConfig();
   let config: DocGenConfig;
