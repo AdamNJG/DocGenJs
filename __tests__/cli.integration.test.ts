@@ -27,6 +27,9 @@ describe('cli flow tests', () => {
       await waitForOutput(cli, `File generated in: docs\\index.html`, output);
       await waitForOutput(cli, `File generated in: docs\\styles.css`, output);
       await waitForOutput(cli, 'Generation completed, you can find your files at ./docs', output);
+      cli.on('close', (code) => {
+        expect(code).toBe(0);
+      });
     } finally {
       if (!cli.killed) {
         cli.kill();

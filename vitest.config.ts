@@ -21,7 +21,7 @@ export default defineConfig({
       '__tests__/treeBuilderFakeTestsRename/**',
       '__tests__/treeBuilderFakeTests/**',
       'node_modules/**',
-      '__tests__/cli.test.ts'
+      '__tests__/cli.integration.test.ts'
     ],
     sequence: {
       concurrent: false
