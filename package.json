@@ -1,6 +1,6 @@
 {
   "name": "doc-gen-js",
-  "version": "0.0.17",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -14,8 +14,9 @@
   "type": "module",
   "scripts": {
     "start": "node ./dist/cli.mjs",
-    "build": "tsup src/Cli/runSiteBuilder.ts --out-dir dist/Cli --format cjs --dts --splitting true && npm run build:cli",
+    "build": "tsup src/Cli --out-dir dist/Cli --format cjs --dts --splitting true && npm run build:cli && npm run build:defaults",
     "build:cli": "cp src/cli.mjs dist/cli.mjs",
+    "build:defaults": "rimraf dist/Defaults && cp -r src/Defaults dist/Defaults",
     "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp && rimraf ./reports && rimraf ./coverage",
     "test": "vitest run --coverage",
     "test:cli": "npm run build && npx vitest run --config vitest.integration.config.ts",
@@ -37,6 +38,7 @@
     "@types/micromatch": "^4.0.9",
     "@types/node": "^24.3.0",
     "@types/prismjs": "^1.26.5",
+    "@types/prompts": "^2.4.9",
     "@typescript-eslint/eslint-plugin": "^8.42.0",
     "@typescript-eslint/parser": "^8.42.0",
     "@vitest/coverage-v8": "^3.2.4",
@@ -58,6 +60,7 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "jsdom": "^26.1.0",
     "micromatch": "^4.0.8",
-    "prismjs": "^1.30.0"
+    "prismjs": "^1.30.0",
+    "prompts": "^2.4.2"
   }
 }

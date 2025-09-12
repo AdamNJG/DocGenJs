@@ -2,11 +2,12 @@
 import { test, expect, describe } from 'vitest';
 import { spawn } from 'node:child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 
 const cliPath = './dist/cli.mjs';
 
 describe('cli flow tests', () => {
-  test('CLI run with correct ', async () => {
+  test('CLI run with correct config and templates', async () => {
     const cli = spawn('node', [cliPath], { stdio: ['pipe', 'pipe', 'pipe'] });
 
     const output = { text: '' };
@@ -40,6 +41,51 @@ describe('cli flow tests', () => {
       if (!cli.killed) {
         cli.kill();
       }
+    }
+  });
+
+  test('CLI run with missing config, creates new one ', async () => {
+    const originalConfigName = './docgen.config.ts';
+    const backupConfigName = './docgen.config.ts.backup';
+
+    renameDocGenConfig(originalConfigName, backupConfigName);
+    const cli = spawn('node', [cliPath], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+    const output = { text: '' };
+    const errors: string[] = [];
+
+    cli.stderr.on('data', (chunk) => {
+      const errorText = chunk.toString();
+      errors.push(errorText);
+      console.error('CLI error:', errorText);
+    });
+
+    try {
+      await waitForOutput(cli, 'DocGen starting', output);
+      await waitForOutput(cli, 'Config not found, would you like to create a new one? y/n', output);
+      cli.stdin.write('y');
+      await waitForOutput(cli, 'What config type would you ', output);
+
+      await waitForOutput(cli, 'Found 6 test files', output);
+      for (const page of ['cli.integration.test', 'components.test', 'config.test', 'pageBuilder.test', 'runSiteBuilder.test', 'treeBuilder.test']) { 
+        const filePath = path.join('docs', `${page}.html`);
+        await waitForOutput(cli, `File generated in: ${filePath}`, output);
+      }
+      await waitForOutput(cli, `File generated in: ${path.join('docs', 'index.html')}`, output);
+      await waitForOutput(cli, `File generated in: ${path.join('docs', 'styles.css')}`, output);
+      await waitForOutput(cli, 'Generation completed, you can find your files at ./docs', output);
+      cli.on('close', (code) => {
+        expect(code).toBe(0);
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } 
+    finally {
+      if (!cli.killed) {
+        cli.kill();
+      }
+      deleteRenamedDocGenConfig(backupConfigName);
     }
   });
 
@@ -97,4 +143,14 @@ function waitForOutput (cli: any,
     
     cli.stdout.on('data', onData);
   });
+}
+
+async function renameDocGenConfig (originalName: string, newName: string) {
+  if (fs.existsSync(originalName)) await fs.promises.rm(originalName);
+
+  if (fs.existsSync(originalName)) await fs.promises.rename(originalName, newName);
+}
+
+async function deleteRenamedDocGenConfig (name: string) {
+  if (fs.existsSync(name)) await fs.promises.rm(name);
 }

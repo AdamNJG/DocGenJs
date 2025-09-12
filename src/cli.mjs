@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 import { JSDOM } from 'jsdom';
 import { createRequire } from 'module';
+
 const require = createRequire(import.meta.url);
 
 async function main () {
+  const setupDefaults = require('./Cli/setupDefaults.cjs');
+  const config = await setupDefaults.default();
+
   await startDom();
  
   const runSiteBuilder = require('./Cli/runSiteBuilder.cjs');
-  await runSiteBuilder.default();
+  await runSiteBuilder.default(config);
 }
 
 async function startDom () {

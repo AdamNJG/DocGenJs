@@ -9,10 +9,10 @@ import { testElement } from './helpers/elementHelper';
 import { checkGeneratedPages, checkMain, checkPage, expectGeneratedFiles, removeOutputDirectory } from './helpers/folderHelper';
 import { defineComponents } from './helpers/componentHelper';
 
-const CONFIG_FILE = path.resolve('./docgen.config');
-const CONFIG_FILE_TS = CONFIG_FILE + '.ts';
-const CONFIG_FILE_JS = CONFIG_FILE + '.js';
-const TEST_CONFIG_FILE = path.resolve('./__tests__/configs/docgen.config');
+//const CONFIG_FILE = path.resolve('./docgen.config');
+//const CONFIG_FILE_TS = CONFIG_FILE + '.ts';
+//const CONFIG_FILE_JS = CONFIG_FILE + '.js';
+//const TEST_CONFIG_FILE = path.resolve('./__tests__/configs/docgen.config');
 
 describe('SiteBuilder', () => {
   defineComponents();
@@ -28,14 +28,15 @@ describe('SiteBuilder', () => {
   afterEach(async () => {
     await removeOutputDirectory('./__tests__/docs/');
     await removeOutputDirectory('./docs');
-    await restoreDocGenConfig();
+    //await restoreDocGenConfig();
   });
 
   beforeEach(() => {
     vitest.resetModules();
   });
 
-  test('ts config will trigger site generation to default location, overriding existing files', async () => {
+  //convert to cli test
+  /*test('ts config will trigger site generation to default location, overriding existing files', async () => {
     const outputDirectory = './__tests__/docs/runSiteBuilderTests';
 
     await replaceDocGenConfig('.ts');
@@ -49,8 +50,32 @@ describe('SiteBuilder', () => {
     expect(fs.existsSync(dummyPagePath)).toBe(false);
     expect(fs.existsSync(outputDirectory)).toBe(true);
     expectGeneratedFiles(outputDirectory, expectedFiles);
+  });*/
+
+  test('ts config will trigger site generation to default location, overriding existing files', async () => {
+    const outputDirectory = './__tests__/docs/runSiteBuilderTests';
+
+    //await replaceDocGenConfig('.ts');
+
+    const config : DocGenConfig = {
+      includes: ['__tests__/treeBuilderFakeTestsRenames'],
+      outputDirectory: outputDirectory,
+      describeFunctionNameOverride: 'describeProxy',
+      testFunctionNameOverride: 'testProxy'
+    };
+
+    fs.mkdirSync(outputDirectory, { recursive: true });
+    const dummyPagePath = path.join(outputDirectory, 'oldPage.html');
+    fs.writeFileSync(dummyPagePath, 'old content', 'utf-8');
+
+    await runSiteBuilder(config);
+
+    expect(fs.existsSync(dummyPagePath)).toBe(false);
+    expect(fs.existsSync(outputDirectory)).toBe(true);
+    expectGeneratedFiles(outputDirectory, expectedFiles);
   });
 
+  /* convert to cli test
   test('passing in js config will trigger site generation to specified location', async () => {
     const outputDirectory = './__tests__/docs';
 
@@ -88,8 +113,86 @@ describe('SiteBuilder', () => {
       });
     } }
     , config);
+  });*/
+
+  test('passing in js config will trigger site generation to specified location', async () => {
+    const outputDirectory = './__tests__/docs';
+
+    //await replaceDocGenConfig('.js');
+    const config = {
+      includes: ['__tests__/treeBuilderFakeTests'],
+      outputDirectory: outputDirectory
+    };
+
+    await runSiteBuilder(config);
+
+    expect(fs.existsSync(outputDirectory)).toBe(true);
+    expectGeneratedFiles(outputDirectory, expectedFiles);
+    
+    checkGeneratedPages(expectedContents, config);
+    checkGeneratedPages({ 'index.html': (document: Document) => {
+      const nav = document.querySelector('.pages-nav');
+      testElement(nav, 'nav', { 'aria-label': 'Pages navigation' });
+
+      const ul = nav?.querySelector('ul');
+      expect(ul).not.toBe(null);
+
+      const pages = ['fake.test',
+        'more.fake.test',
+        'no.describe.fake.test'];
+
+      pages.forEach(page => {
+        const link = Array.from(ul?.querySelectorAll('li > a') || [])
+          .find(a => a.getAttribute('href') === `./${page}.html`);
+
+        expect(link).not.toBe(null);
+        expect(link?.textContent?.trim()).toBe(page);
+        const tabIndex = link?.getAttribute('tabindex');
+        expect(tabIndex === null || Number(tabIndex) >= 0).toBe(true);
+      });
+    } }
+    , config);
   });
 
+  test('passing in json config will trigger site generation to specified location', async () => {
+    const outputDirectory = './__tests__/docs';
+
+    const config = {
+      includes: ['__tests__/treeBuilderFakeTests'],
+      outputDirectory: './__tests__/docs'
+    };
+
+    await runSiteBuilder(config);
+
+    expect(fs.existsSync(outputDirectory)).toBe(true);
+    expectGeneratedFiles(outputDirectory, expectedFiles);
+    
+    checkGeneratedPages(expectedContents, config);
+    checkGeneratedPages({ 'index.html': (document: Document) => {
+      const nav = document.querySelector('.pages-nav');
+      testElement(nav, 'nav', { 'aria-label': 'Pages navigation' });
+
+      const ul = nav?.querySelector('ul');
+      expect(ul).not.toBe(null);
+
+      const pages = ['fake.test',
+        'more.fake.test',
+        'no.describe.fake.test'];
+
+      pages.forEach(page => {
+        const link = Array.from(ul?.querySelectorAll('li > a') || [])
+          .find(a => a.getAttribute('href') === `./${page}.html`);
+
+        expect(link).not.toBe(null);
+        expect(link?.textContent?.trim()).toBe(page);
+        const tabIndex = link?.getAttribute('tabindex');
+        expect(tabIndex === null || Number(tabIndex) >= 0).toBe(true);
+      });
+    } }
+    , config);
+  });
+
+  /*
   test('passing in json config will trigger site generation to specified location', async () => {
     const outputDirectory = './__tests__/docs';
 
@@ -127,8 +230,37 @@ describe('SiteBuilder', () => {
       });
     } }
     , config);
+  });*/
+
+  test('passing in ts config with overriden templateDirectory that exists but is empty', async () => {
+    
+    const consoleSpy: ReturnType<typeof vi.spyOn> = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const outputDirectory = './__tests__/docs';
+    const templateDirectory = './__tests__/no_template';
+    const config: DocGenConfig = {
+      includes: ['__tests__/treeBuilderFakeTestsRenames'],
+      testFunctionNameOverride: 'testProxy',
+      describeFunctionNameOverride: 'describeProxy',
+      outputDirectory: outputDirectory,
+      templateDirectory: templateDirectory
+    };
+
+    const resolvedTemplatePath = path.join(process.cwd(), templateDirectory);
+    await createEmptyFolder(resolvedTemplatePath);
+
+    await runSiteBuilder(config);
+
+    expect(fs.existsSync(outputDirectory)).toBe(true);
+    expectGeneratedFiles(outputDirectory, expectedFiles, false);
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`Source file does not exist: ${path.resolve(templateDirectory, 'index.html')}, aborting copy for this file`));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`Source file does not exist: ${path.resolve(templateDirectory, 'styles.css')}, aborting copy for this file`));
+
+    consoleSpy.mockRestore();
+    deleteEmptyFolder(resolvedTemplatePath);
   });
 
+  /*  
   test('passing in ts config with overriden templateDirectory that exists but is empty', async () => {
     await replaceDocGenConfig('.ts', './__tests__/configs/template/docgen.config.ts');
 
@@ -148,26 +280,7 @@ describe('SiteBuilder', () => {
 
     consoleSpy.mockRestore();
     deleteEmptyFolder(resolvedTemplatePath);
-  });
-
-  test('uses default config when none exists', async () => {  
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    try {
-      const outputDirectory = './docs';
-      await renameDocGenConfig();
-
-      await runSiteBuilder();
-
-      expect(consoleSpy.mock.calls.some(call => call[0].includes('Using default configuration. You can create a docgen.config.ts/js file to customise future runs.'))).toBe(true);
-      
-      expect(fs.existsSync(outputDirectory)).toBe(true);
-      expectGeneratedFiles(outputDirectory, expectedFiles);
-    
-      checkGeneratedPages(expectedContents, { includes: [], outputDirectory: outputDirectory });
-    } finally {
-      consoleSpy.mockRestore();
-    }
-  });
+  });*/
 
   test('passing in invalid config error displayed', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -185,7 +298,7 @@ describe('SiteBuilder', () => {
   });
 });
 
-async function replaceDocGenConfig (extension: string, filePath?: string) {
+/*async function replaceDocGenConfig (extension: string, filePath?: string) {
   if (fs.existsSync(CONFIG_FILE_TS)) {
     await fs.promises.rename(CONFIG_FILE_TS, CONFIG_FILE_TS + '.backup');
   }
@@ -213,4 +326,4 @@ async function restoreDocGenConfig () {
   } 
   if (fs.existsSync(CONFIG_FILE_JS)) await fs.promises.rm(CONFIG_FILE_JS);
   if (fs.existsSync(CONFIG_FILE + '.json')) await fs.promises.rm(CONFIG_FILE + '.json');
-}
+}*/

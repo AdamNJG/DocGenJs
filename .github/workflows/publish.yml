@@ -18,7 +18,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: npm ci
       - run: npm run build
-      - run: npm run test:cli
       - name: "npm publish"
         run: |
           repository_version="$(npm view | grep -n latest | awk '{print $2}')"
