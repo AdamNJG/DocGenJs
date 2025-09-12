@@ -116,7 +116,7 @@ class SiteBuilder {
       this._pages = [];
       return;
     }
-    const pages = PageBuilder.buildPages(this._tree.tree, this._nav);
+    const pages = PageBuilder.buildPages(this._tree.tree, this._nav, this._config.templateDirectory);
     console.log(`Found ${Object.keys(pages).length} test files`);
     Object.entries(pages).forEach(([key, value]) => {
       this.createHtmlFromPage(key, value);
