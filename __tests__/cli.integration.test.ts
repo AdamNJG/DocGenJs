@@ -1,6 +1,7 @@
 
 import { test, expect, describe } from 'vitest';
 import { spawn } from 'node:child_process';
+import * as path from 'path';
 
 const cliPath = './dist/cli.mjs';
 
@@ -22,15 +23,20 @@ describe('cli flow tests', () => {
       await waitForOutput(cli, 'Config found and parsed successfully', output);
       await waitForOutput(cli, 'Found 6 test files', output);
       for (const page of ['cli.integration.test', 'components.test', 'config.test', 'pageBuilder.test', 'runSiteBuilder.test', 'treeBuilder.test']) { 
-        await waitForOutput(cli, `File generated in: docs\\${page}.html`, output);
+        const filePath = path.join('docs', `${page}.html`);
+        await waitForOutput(cli, `File generated in: ${filePath}`, output);
       }
-      await waitForOutput(cli, `File generated in: docs\\index.html`, output);
-      await waitForOutput(cli, `File generated in: docs\\styles.css`, output);
+      await waitForOutput(cli, `File generated in: ${path.join('docs', 'index.html')}`, output);
+      await waitForOutput(cli, `File generated in: ${path.join('docs', 'styles.css')}`, output);
       await waitForOutput(cli, 'Generation completed, you can find your files at ./docs', output);
       cli.on('close', (code) => {
         expect(code).toBe(0);
       });
-    } finally {
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } 
+    finally {
       if (!cli.killed) {
         cli.kill();
       }
