@@ -1,6 +1,6 @@
 {
   "name": "doc-gen-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "start": "node ./dist/cli.mjs",
-    "build": "tsup src/Cli --out-dir dist/Cli --format cjs --dts --splitting true && npm run build:cli && npm run build:defaults",
+    "build": "tsup src/Cli --out-dir dist/Cli --format cjs --dts --splitting true && tsc && npm run build:cli && npm run build:defaults",
     "build:cli": "cp src/cli.mjs dist/cli.mjs",
     "build:defaults": "rimraf dist/Defaults && cp -r src/Defaults dist/Defaults",
     "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp && rimraf ./reports && rimraf ./coverage",
