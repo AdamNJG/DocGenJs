@@ -18,7 +18,7 @@
     "build:cli": "cp src/cli.mjs dist/cli.mjs",
     "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp && rimraf ./reports && rimraf ./coverage",
     "test": "vitest run --coverage",
-    "test:cli": "npm run build && npx vitest run cli.integration.test.ts",
+    "test:cli": "npm run build && npx vitest run --config vitest.integration.config.ts",
     "test:mutation": "npx stryker run && rimraf ./.stryker-tmp"
   },
   "keywords": [],
