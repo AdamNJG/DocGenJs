@@ -5,9 +5,9 @@ import ModuleComponent from '../Components/pages/module';
 
 class PageBuilder {
 
-  static buildPages (tree: InstructionTree, nav: string): Record<string, string> {
+  static buildPages (tree: InstructionTree, nav: string, templateDirectory: string): Record<string, string> {
     const renderedHtml: Record<string, string> = {};
-    const templatePath = path.resolve('./templates/page.html');
+    const templatePath = path.resolve(templateDirectory,'page.html');
     const template = fs.readFileSync(templatePath, 'utf-8');
 
     for (const page of tree.pages) {

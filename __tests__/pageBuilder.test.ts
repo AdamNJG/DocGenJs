@@ -10,7 +10,7 @@ describe('web builder', () => {
   defineComponents();
 
   test('pageBuilder is passed no pages, so no results', () => {
-    const pageResult = PageBuilder.buildPages({ pages: [] }, '');
+    const pageResult = PageBuilder.buildPages({ pages: [] }, '', './Templates');
 
     expect(Object.keys(pageResult)).toHaveLength(0);
   });
@@ -21,7 +21,7 @@ describe('web builder', () => {
       features: []
     };
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '');
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '', './Templates');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 
@@ -57,7 +57,7 @@ describe('web builder', () => {
     const navComponent = new PageNav();
     navComponent.setup(navPages.map(p => p.name));
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] }, navComponent.innerHTML);
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, navComponent.innerHTML, './Templates');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 
@@ -93,7 +93,7 @@ describe('web builder', () => {
       }]
     };
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '');
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '', './Templates');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 
@@ -135,7 +135,7 @@ console.log(greet('World'));`
       }]
     };
 
-    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '');
+    const htmlPages = PageBuilder.buildPages({ pages: [page] }, '', './Templates');
     expect(Object.keys(htmlPages)).toHaveLength(1);
     const doc = buildDocumentFromHtml(htmlPages[page.name]);
 
