@@ -34,9 +34,10 @@ export async function offerToUseDefaults (config: DocGenConfig) {
     process.exit(1);
   }
 
-  const srcDir = path.resolve(`./dist/Defaults/Templates`);
+  const srcDir = path.resolve(__dirname, `../Defaults/Templates`);
   const templateDirectory = path.resolve(config.templateDirectory ?? './Templates');
   fs.cpSync(srcDir, templateDirectory, { recursive: true });
+  console.log(srcDir);
   console.log(`Default Templates folder added to ${config.templateDirectory ?? './Templates'}`);
 }
 
