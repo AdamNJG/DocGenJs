@@ -116,6 +116,7 @@ class SiteBuilder {
       this._pages = [];
       return;
     }
+    
     const pages = PageBuilder.buildPages(this._tree.tree, this._nav, this._config.templateDirectory);
     console.log(`Found ${Object.keys(pages).length} test files`);
     Object.entries(pages).forEach(([key, value]) => {
@@ -128,7 +129,7 @@ class SiteBuilder {
   private createHtmlFromPage (pageName: string, page: string) {
     try {
       const outputDir = path.join(this._config.outputDirectory, `${pageName}.html`);
-      fs.writeFileSync(outputDir, page,'utf-8');
+      fs.writeFileSync(outputDir, page, 'utf-8');
       console.log(`File generated in: ${outputDir}`);
     } catch (err) {
       console.error(`Error saving html file: ${pageName}.html, Error: ${err}`);

@@ -10,10 +10,10 @@ export async function setDefaultConfig () : Promise<DocGenConfig> {
   const srcDir = path.join(__dirname, '../defaults/docgen.config');
   const destDir = path.join(process.cwd(), 'docgen.config');
 
-  if (!process.stdin.isTTY) {
+  if (!process.stdin.isTTY && !process.env.FORCE_INTERACTIVE) {
     console.log('Non-interactive environment, using default config (.js CommonJS)');
     const src = srcDir + '.cjs';
-    const dest = path.join(destDir, '.js');
+    const dest = destDir + '.js';
     fs.copyFileSync(src, dest);
 
     const config = await import(src); 
@@ -32,29 +32,37 @@ export async function setDefaultConfig () : Promise<DocGenConfig> {
 
   switch (response.value) {
   case '.ts': {
-    const src = srcDir + '.ts';
-    const dest = destDir + '.ts';
+    const extension = '.ts';
+    const src = srcDir + extension;
+    const dest = destDir + extension;
     fs.copyFileSync(src, dest);
+    logCreatedConfig(extension);
     return importTsConfig(src);
   }
   case '.js (CommonJS)': {
-    const src = srcDir + '.cjs';
-    const dest = destDir + '.cjs';
+    const extension = '.cjs';
+    const src = srcDir + extension;
+    const dest = destDir + extension;
     fs.copyFileSync(src, dest);
+    logCreatedConfig(extension);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const config = require(dest);
     return (config.default ?? config) as DocGenConfig;
   }
   case '.js (Module)': {
-    const src = srcDir + '.mjs';
-    const dest = destDir + '.mjs';
+    const extension = '.mjs';
+    const src = srcDir + extension;
+    const dest = destDir + extension;
     fs.copyFileSync(src, dest);
+    logCreatedConfig(extension);
     return (await import(dest)).default as DocGenConfig;
   }
   case 'JSON': {
-    const src = srcDir + '.json';
-    const dest = destDir + '.json';
+    const extension = '.json';
+    const src = srcDir + extension;
+    const dest = destDir + extension;
     fs.copyFileSync(src, dest);
+    logCreatedConfig(extension);
     const json = fs.readFileSync(dest, 'utf8');
     return JSON.parse(json);
   }
@@ -67,6 +75,10 @@ export async function setDefaultConfig () : Promise<DocGenConfig> {
     process.exit(1);
   }
 
+}
+
+function logCreatedConfig (extension: string) {
+  console.log(`default config created: docgen.config${extension}`);
 }
 
 export async function loadConfig (): Promise<DocGenConfig | undefined> {
