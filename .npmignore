@@ -5,8 +5,6 @@ reports
 
 # Source files
 src
-
-
 # Config files (only needed for local dev)
 eslint.config.ts
 stryker.config.json

@@ -1,5 +1,5 @@
 import { setDefaultConfig, loadConfig } from './setupConfig';
-import { offerToUseDefaults, templatesExist } from './setupTemplates';
+import { fileExists, offerToUseDefaultFile, offerToUseDefaults, templatesExist } from './setupTemplates';
 
 async function checkForAndReplaceConfig () {
   console.log('DocGen starting');
@@ -16,6 +16,12 @@ async function checkForAndReplaceConfig () {
 
   if (!templatesExist(config)) {
     await offerToUseDefaults(config);
+  }
+
+  for (const file of ['index.html', 'styles.css', 'page.html']) {
+    if (!fileExists(config, file)) {
+      await offerToUseDefaultFile(config, file);
+    }
   }
 
   return config;
