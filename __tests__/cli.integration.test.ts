@@ -307,7 +307,7 @@ describe('cli flow tests', () => {
   });
 });
 
-describe('Cli output tests', () => {
+/*describe('Cli output tests', () => {
   const expectedFiles = ['index.html', 'styles.css'];
   /*test('templateDirectory that exists but is empty insert defaults', async () => {
     await replaceDocGenConfig('.ts', './__tests__/configs/template/docgen.config.ts');
@@ -328,8 +328,8 @@ describe('Cli output tests', () => {
 
     consoleSpy.mockRestore();
     deleteEmptyFolder(resolvedTemplatePath);
-  });*/
-});
+  });
+});*/
 
 function removeFile (pathName: string) {
   const filePath = path.resolve(pathName);
