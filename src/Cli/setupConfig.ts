@@ -7,7 +7,7 @@ import ts from 'typescript';
 import vm from 'vm';
 
 export async function setDefaultConfig () : Promise<DocGenConfig> {
-  const srcDir = path.join(__dirname, '../defaults/docgen.config');
+  const srcDir = path.join(__dirname, '../Defaults/docgen.config');
   const destDir = path.join(process.cwd(), 'docgen.config');
 
   if (!process.stdin.isTTY && !process.env.FORCE_INTERACTIVE) {

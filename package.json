@@ -16,7 +16,7 @@
     "start": "node ./dist/cli.mjs",
     "build": "tsup src/Cli --out-dir dist/Cli --format cjs --dts --splitting true && tsc && npm run build:cli && npm run build:defaults",
     "build:cli": "cp src/cli.mjs dist/cli.mjs",
-    "build:defaults": "rimraf dist/Defaults && cp -r src/Defaults dist/Defaults && ls dist/Defaults",
+    "build:defaults": "rimraf dist/Defaults && cp -r src/Defaults dist/Defaults",
     "clean": "rimraf ./dist && rimraf ./docs && rimraf ./.stryker-tmp && rimraf ./reports && rimraf ./coverage",
     "test": "vitest run --coverage",
     "test:cli": "npm run build && npx vitest run --config vitest.integration.config.ts",
